@@ -49,7 +49,7 @@ export default function Dashboard() {
     useEffect(() => {
         if (activeTab === 'lottery') {
             fetchLotteryConfig()
-        } else if (activeTab === 'users' && role === 'admin') {
+        } else if (activeTab === 'users' && (role === 'admin' || role === 'editor')) {
             fetchUsers()
         } else if (activeTab === 'news') {
             fetchNews()
@@ -347,6 +347,22 @@ export default function Dashboard() {
         }
     }
 
+    const handleDeleteUser = async (userId: string) => {
+        if (!confirm('¿Estás seguro de que quieres eliminar este usuario? Esta acción borrará su perfil y su cuenta de acceso permanentemente.')) return
+        try {
+            // Call the RPC function to delete from auth.users (cascade deletes profile)
+            const { error } = await supabase.rpc('delete_user_fully', { target_user_id: userId })
+
+            if (error) throw error
+
+            setAllUsers(allUsers.filter(user => user.id !== userId))
+            alert('Usuario y cuenta eliminados correctamente')
+        } catch (error: any) {
+            console.error('Delete error:', error)
+            alert('Error eliminando usuario: ' + error.message)
+        }
+    }
+
     const handleUpdateRepresentative = async (e: React.FormEvent, repId: string, name: string, description: string, imageFile: File | null, currentImageUrl: string) => {
         e.preventDefault()
         setLoading(true)
@@ -503,7 +519,7 @@ export default function Dashboard() {
                             Galería
                         </button>
                     )}
-                    {role === 'admin' && (
+                    {(role === 'admin' || role === 'editor') && (
                         <button
                             onClick={() => setActiveTab('users')}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'users'
@@ -873,7 +889,7 @@ export default function Dashboard() {
                         </form>
                     )}
 
-                    {activeTab === 'users' && role === 'admin' && (
+                    {activeTab === 'users' && (role === 'admin' || role === 'editor') && (
                         <div className="space-y-6">
                             <h2 className="text-2xl font-bold text-white mb-6">Gestión de Usuarios</h2>
 
@@ -910,25 +926,25 @@ export default function Dashboard() {
                                                     </div>
                                                 </td>
                                                 <td className="py-4 px-4">
-                                                    <button
-                                                        onClick={() => handleToggleActive(user.id, user.active !== false)}
-                                                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold transition-all ${user.active !== false
-                                                            ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                                                            : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                                                            }`}
-                                                    >
-                                                        {user.active !== false ? (
-                                                            <>
-                                                                <CheckCircle size={14} />
-                                                                Activo
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <XCircle size={14} />
-                                                                Inactivo
-                                                            </>
-                                                        )}
-                                                    </button>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => handleToggleActive(user.id, user.active !== false)}
+                                                            title={user.active !== false ? "Desactivar usuario" : "Activar usuario"}
+                                                            className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold transition-all ${user.active !== false
+                                                                ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                                                                : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                                                                }`}
+                                                        >
+                                                            {user.active !== false ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteUser(user.id)}
+                                                            title="Eliminar usuario"
+                                                            className="flex items-center justify-center w-8 h-8 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                                 <td className="py-4 px-4 text-gray-400 text-sm">
                                                     {new Date(user.created_at).toLocaleDateString()}
