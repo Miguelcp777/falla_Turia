@@ -22,15 +22,19 @@ Plataforma web moderna para la Falla Turia que permite a los miembros de la comi
 - 🖼️ **Galería de Fotos**: Visualización de imágenes de la comisión
 - 💬 **Sugerencias**: Buzón para propuestas y sugerencias
 - 🌍 **Multiidioma**: Español y Valenciano
+- 👤 **Perfil de Usuario**: Visualización del nombre completo en el navbar
+- 📝 **Registro Completo**: Formulario con nombre, apellidos, dirección y teléfono
 
 ### Para Administradores
 - 📊 **Dashboard Completo**: Panel de control administrativo
 - 👤 **Gestión de Usuarios**: Control de roles (Admin, Editor, Author, Subscriber)
+- ✏️ **Edición de Perfiles**: Modificación completa de datos de usuario (nombre, apellidos, dirección, teléfono)
 - 📝 **Gestión de Contenido**: Creación y edición de noticias y eventos
 - 🎰 **Configuración de Lotería**: Administración del sorteo navideño
 - 👑 **Gestión de Representantes**: Actualización de información y fotos
 - 📸 **Galería Administrativa**: Subida múltiple de imágenes
 - 🔐 **Sistema RBAC**: Control de acceso basado en roles
+- 🗑️ **Eliminación Completa**: Borrado total de usuarios incluyendo cuenta de autenticación
 
 ## 🛠️ Tecnologías
 
@@ -94,7 +98,11 @@ CREATE TABLE public.profiles (
   role text CHECK (role IN ('subscriber', 'author', 'editor', 'admin')) DEFAULT 'subscriber',
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
-  active boolean DEFAULT true
+  active boolean DEFAULT true,
+  first_name text,
+  last_name text,
+  address text,
+  phone text
 );
 
 -- Habilitar RLS
@@ -112,8 +120,17 @@ CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE TO au
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, role, active)
-  VALUES (new.id, new.email, 'subscriber', true);
+  INSERT INTO public.profiles (id, email, role, active, first_name, last_name, address, phone)
+  VALUES (
+    new.id,
+    new.email,
+    'subscriber',
+    true,
+    new.raw_user_meta_data->>'first_name',
+    new.raw_user_meta_data->>'last_name',
+    new.raw_user_meta_data->>'address',
+    new.raw_user_meta_data->>'phone'
+  );
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

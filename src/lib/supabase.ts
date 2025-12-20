@@ -17,4 +17,8 @@ export type Profile = {
     role: UserRole
     created_at: string
     active: boolean
+    first_name?: string
+    last_name?: string
+    address?: string
+    phone?: string
 }

@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { Menu, X, LogOut, Shield } from 'lucide-react'
+import { Menu, X, LogOut, Shield, User } from 'lucide-react'
 import { useState } from 'react'
 
 export default function Navbar() {
-    const { user, checkPermission, signOut } = useAuth()
+    const { user, profile, checkPermission, signOut } = useAuth()
     const { language, setLanguage, t } = useLanguage()
     const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false)
@@ -113,6 +113,15 @@ export default function Navbar() {
 
                         {user ? (
                             <div className="flex items-center gap-4">
+                                <div className="hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2">
+                                    <User size={16} className="text-primary" />
+                                    <span className="text-sm font-medium text-white">
+                                        {profile?.first_name && profile?.last_name
+                                            ? `${profile.first_name} ${profile.last_name}`
+                                            : user.email
+                                        }
+                                    </span>
+                                </div>
                                 <button
                                     onClick={handleSignOut}
                                     className="text-gray-300 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase, Profile, UserRole } from '@/lib/supabase'
-import { Flame, Calendar, Newspaper, Plus, Upload, Clover, Save, Users, Shield, CheckCircle, XCircle, Trash2, Edit2, X, Crown, Image as ImageIcon } from 'lucide-react'
+import { Flame, Calendar, Newspaper, Plus, Upload, Clover, Save, Users, Shield, CheckCircle, XCircle, Trash2, Edit2 as Edit, X, Crown, Image as ImageIcon } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 
 type Tab = 'news' | 'agenda' | 'lottery' | 'users' | 'representatives' | 'gallery'
@@ -45,6 +45,8 @@ export default function Dashboard() {
     const [galleryList, setGalleryList] = useState<any[]>([])
     const [galleryUploadTitle, setGalleryUploadTitle] = useState('')
     const [galleryUploadFiles, setGalleryUploadFiles] = useState<File[]>([])
+    const [editingUserId, setEditingUserId] = useState<string | null>(null)
+    const [editingUserData, setEditingUserData] = useState<Partial<Profile>>({})
 
     useEffect(() => {
         if (activeTab === 'lottery') {
@@ -63,7 +65,7 @@ export default function Dashboard() {
     }, [activeTab, role])
 
     const fetchNews = async () => {
-        const { data, error } = await supabase
+        const { data } = await supabase
             .from('news')
             .select('*')
             .order('created_at', { ascending: false })
@@ -71,7 +73,7 @@ export default function Dashboard() {
     }
 
     const fetchAgenda = async () => {
-        const { data, error } = await supabase
+        const { data } = await supabase
             .from('agenda')
             .select('*')
             .order('event_date', { ascending: true })
@@ -360,6 +362,47 @@ export default function Dashboard() {
         } catch (error: any) {
             console.error('Delete error:', error)
             alert('Error eliminando usuario: ' + error.message)
+        }
+    }
+
+    const handleEditUser = (user: Profile) => {
+        setEditingUserId(user.id)
+        setEditingUserData({
+            first_name: user.first_name || '',
+            last_name: user.last_name || '',
+            address: user.address || '',
+            phone: user.phone || ''
+        })
+    }
+
+    const handleCancelEdit = () => {
+        setEditingUserId(null)
+        setEditingUserData({})
+    }
+
+    const handleSaveUserProfile = async (userId: string) => {
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    first_name: editingUserData.first_name,
+                    last_name: editingUserData.last_name,
+                    address: editingUserData.address,
+                    phone: editingUserData.phone
+                })
+                .eq('id', userId)
+
+            if (error) throw error
+
+            // Optimistic update
+            setAllUsers(allUsers.map(user =>
+                user.id === userId ? { ...user, ...editingUserData } : user
+            ))
+            setEditingUserId(null)
+            setEditingUserData({})
+            alert('Perfil actualizado correctamente')
+        } catch (error: any) {
+            alert('Error actualizando perfil: ' + error.message)
         }
     }
 
@@ -668,7 +711,7 @@ export default function Dashboard() {
                                                         onClick={() => startEditNews(item)}
                                                         className="p-2 hover:bg-white/10 rounded-lg text-blue-400 transition-colors"
                                                     >
-                                                        <Edit2 size={18} />
+                                                        <Edit size={18} />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteNews(item.id)}
@@ -789,7 +832,7 @@ export default function Dashboard() {
                                                         onClick={() => startEditAgenda(item)}
                                                         className="p-2 hover:bg-white/10 rounded-lg text-blue-400 transition-colors"
                                                     >
-                                                        <Edit2 size={18} />
+                                                        <Edit size={18} />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteAgenda(item.id)}
@@ -898,58 +941,146 @@ export default function Dashboard() {
                                     <thead>
                                         <tr className="border-b border-white/10 text-gray-400 text-sm uppercase">
                                             <th className="py-4 px-4">Usuario</th>
+                                            <th className="py-4 px-4">Nombre Completo</th>
                                             <th className="py-4 px-4">Rol</th>
                                             <th className="py-4 px-4">Estado</th>
-                                            <th className="py-4 px-4">Registrado</th>
+                                            <th className="py-4 px-4">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/5">
                                         {allUsers.map((user) => (
-                                            <tr key={user.id} className="hover:bg-white/5 transition-colors">
-                                                <td className="py-4 px-4">
-                                                    <div className="text-white font-medium">{user.email}</div>
-                                                    <div className="text-xs text-gray-500 font-mono">{user.id.slice(0, 8)}...</div>
-                                                </td>
-                                                <td className="py-4 px-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <Shield size={16} className="text-primary" />
-                                                        <select
-                                                            value={user.role}
-                                                            onChange={(e) => handleUpdateRole(user.id, e.target.value as UserRole)}
-                                                            className="bg-background-dark border border-white/10 rounded-lg py-1 px-3 text-sm text-white focus:ring-1 focus:ring-primary focus:outline-none"
-                                                        >
-                                                            <option value="admin">Admin</option>
-                                                            <option value="editor">Editor</option>
-                                                            <option value="author">Autor</option>
-                                                            <option value="subscriber">Suscriptor</option>
-                                                        </select>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-4">
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => handleToggleActive(user.id, user.active !== false)}
-                                                            title={user.active !== false ? "Desactivar usuario" : "Activar usuario"}
-                                                            className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold transition-all ${user.active !== false
-                                                                ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                                                                : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                                                                }`}
-                                                        >
-                                                            {user.active !== false ? <CheckCircle size={14} /> : <XCircle size={14} />}
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDeleteUser(user.id)}
-                                                            title="Eliminar usuario"
-                                                            className="flex items-center justify-center w-8 h-8 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-4 text-gray-400 text-sm">
-                                                    {new Date(user.created_at).toLocaleDateString()}
-                                                </td>
-                                            </tr>
+                                            <React.Fragment key={user.id}>
+                                                <tr className="hover:bg-white/5 transition-colors">
+                                                    <td className="py-4 px-4">
+                                                        <div className="text-white font-medium">{user.email}</div>
+                                                        <div className="text-xs text-gray-500 font-mono">{user.id.slice(0, 8)}...</div>
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <div className="text-white">
+                                                            {user.first_name && user.last_name
+                                                                ? `${user.first_name} ${user.last_name}`
+                                                                : <span className="text-gray-500 italic">Sin datos</span>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <Shield size={16} className="text-primary" />
+                                                            <select
+                                                                value={user.role}
+                                                                onChange={(e) => handleUpdateRole(user.id, e.target.value as UserRole)}
+                                                                className="bg-background-dark border border-white/10 rounded-lg py-1 px-3 text-sm text-white focus:ring-1 focus:ring-primary focus:outline-none"
+                                                            >
+                                                                <option value="admin">Admin</option>
+                                                                <option value="editor">Editor</option>
+                                                                <option value="author">Autor</option>
+                                                                <option value="subscriber">Suscriptor</option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                onClick={() => handleToggleActive(user.id, user.active !== false)}
+                                                                title={user.active !== false ? "Desactivar usuario" : "Activar usuario"}
+                                                                className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold transition-all ${user.active !== false
+                                                                    ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                                                                    : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                                                                    }`}
+                                                            >
+                                                                {user.active !== false ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                onClick={() => handleEditUser(user)}
+                                                                title="Editar perfil"
+                                                                className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 transition-colors"
+                                                            >
+                                                                <Edit size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteUser(user.id)}
+                                                                title="Eliminar usuario"
+                                                                className="flex items-center justify-center w-8 h-8 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                                {/* Expandable edit row */}
+                                                {editingUserId === user.id && (
+                                                    <tr className="bg-white/5">
+                                                        <td colSpan={5} className="p-6">
+                                                            <div className="bg-surface-dark border border-white/10 rounded-xl p-6">
+                                                                <h3 className="text-lg font-bold text-white mb-4">Editar Perfil de Usuario</h3>
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                    <div>
+                                                                        <label className="block text-sm font-medium text-gray-400 mb-2">Nombre</label>
+                                                                        <input
+                                                                            type="text"
+                                                                            value={editingUserData.first_name || ''}
+                                                                            onChange={(e) => setEditingUserData({ ...editingUserData, first_name: e.target.value })}
+                                                                            className="w-full bg-background-dark border border-white/10 rounded-lg py-2 px-3 text-white focus:ring-1 focus:ring-primary focus:outline-none"
+                                                                            placeholder="Nombre"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="block text-sm font-medium text-gray-400 mb-2">Apellidos</label>
+                                                                        <input
+                                                                            type="text"
+                                                                            value={editingUserData.last_name || ''}
+                                                                            onChange={(e) => setEditingUserData({ ...editingUserData, last_name: e.target.value })}
+                                                                            className="w-full bg-background-dark border border-white/10 rounded-lg py-2 px-3 text-white focus:ring-1 focus:ring-primary focus:outline-none"
+                                                                            placeholder="Apellidos"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="block text-sm font-medium text-gray-400 mb-2">Dirección</label>
+                                                                        <input
+                                                                            type="text"
+                                                                            value={editingUserData.address || ''}
+                                                                            onChange={(e) => setEditingUserData({ ...editingUserData, address: e.target.value })}
+                                                                            className="w-full bg-background-dark border border-white/10 rounded-lg py-2 px-3 text-white focus:ring-1 focus:ring-primary focus:outline-none"
+                                                                            placeholder="Dirección"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="block text-sm font-medium text-gray-400 mb-2">Teléfono</label>
+                                                                        <input
+                                                                            type="tel"
+                                                                            value={editingUserData.phone || ''}
+                                                                            onChange={(e) => setEditingUserData({ ...editingUserData, phone: e.target.value })}
+                                                                            className="w-full bg-background-dark border border-white/10 rounded-lg py-2 px-3 text-white focus:ring-1 focus:ring-primary focus:outline-none"
+                                                                            placeholder="Teléfono"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex gap-3 mt-6">
+                                                                    <button
+                                                                        onClick={() => handleSaveUserProfile(user.id)}
+                                                                        className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold px-6 py-2 rounded-lg transition-all"
+                                                                    >
+                                                                        <Save size={16} />
+                                                                        Guardar Cambios
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={handleCancelEdit}
+                                                                        className="flex items-center gap-2 bg-gray-500/20 hover:bg-gray-500/30 text-gray-300 font-bold px-6 py-2 rounded-lg transition-all"
+                                                                    >
+                                                                        <X size={16} />
+                                                                        Cancelar
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </React.Fragment>
                                         ))}
                                     </tbody>
                                 </table>

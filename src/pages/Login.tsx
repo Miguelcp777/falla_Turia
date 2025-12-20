@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { Flame, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react'
+import { Flame, Lock, Mail, AlertCircle, ArrowRight, User, MapPin, Phone } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 
 export default function Login() {
@@ -11,6 +11,10 @@ export default function Login() {
     const [mode, setMode] = useState<'login' | 'register'>('login')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
+    const [address, setAddress] = useState('')
+    const [phone, setPhone] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [message, setMessage] = useState<string | null>(null)
@@ -25,9 +29,19 @@ export default function Login() {
                 await signIn(email, password)
                 navigate('/')
             } else {
-                await signUp(email, password)
+                await signUp(email, password, {
+                    first_name: firstName,
+                    last_name: lastName,
+                    address: address,
+                    phone: phone
+                })
                 setMessage('¡Cuenta creada! Revisa tu email o inicia sesión.')
                 setMode('login')
+                // Clear form
+                setFirstName('')
+                setLastName('')
+                setAddress('')
+                setPhone('')
             }
         } catch (error: any) {
             setError(error.message || t('login.error_auth'))
@@ -67,6 +81,66 @@ export default function Login() {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {mode === 'register' && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2 ml-1">Nombre</label>
+                                    <div className="relative">
+                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                        <input
+                                            type="text"
+                                            value={firstName}
+                                            onChange={(e) => setFirstName(e.target.value)}
+                                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-12 py-3.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600"
+                                            placeholder="Tu nombre"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2 ml-1">Apellidos</label>
+                                    <div className="relative">
+                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                        <input
+                                            type="text"
+                                            value={lastName}
+                                            onChange={(e) => setLastName(e.target.value)}
+                                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-12 py-3.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600"
+                                            placeholder="Tus apellidos"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2 ml-1">Dirección</label>
+                                    <div className="relative">
+                                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                        <input
+                                            type="text"
+                                            value={address}
+                                            onChange={(e) => setAddress(e.target.value)}
+                                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-12 py-3.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600"
+                                            placeholder="Tu dirección"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2 ml-1">Teléfono</label>
+                                    <div className="relative">
+                                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                        <input
+                                            type="tel"
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-12 py-3.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600"
+                                            placeholder="Tu teléfono"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </>
+                        )}
                         <div>
                             <label className="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2 ml-1">{t('login.email')}</label>
                             <div className="relative">
