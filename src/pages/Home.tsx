@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Calendar as CalendarIcon, Newspaper, ArrowRight, Flame, Clock, Crown } from 'lucide-react'
+import { Calendar as CalendarIcon, Newspaper, ArrowRight, Flame, Clock, Crown, Mail, Facebook, Instagram } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import Countdown from '@/components/ui/Countdown'
 import { EVENTS } from '@/data/events'
@@ -37,68 +37,10 @@ export default function Home() {
                 </p>
 
                 <Countdown />
-
-                {/* Next Event Teaser */}
-                <div className="max-w-md mx-auto mb-12 transform hover:scale-105 transition-transform duration-300">
-                    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-red-600"></div>
-                        <div className="flex items-start gap-4">
-                            <div className="p-3 bg-primary/20 rounded-xl">
-                                <CalendarIcon className="w-8 h-8 text-red-300" />
-                            </div>
-                            <div className="text-left">
-                                <span className="text-xs font-bold text-red-300 uppercase tracking-wider mb-1 block">
-                                    {t('home.next_event')}
-                                </span>
-                                <h3 className="text-xl font-bold text-white mb-2">
-                                    {(() => {
-                                        // Logic to find next event
-                                        const now = new Date()
-                                        // We use require here to avoid top-level import issues if circular, but standard import is better. 
-                                        // Ideally passed as prop or imported at top.
-                                        // Let's assume standard import at top.
-                                        const nextEvent = EVENTS.find(e => new Date(e.event_date) > now)
-                                        if (!nextEvent) return t('home.no_events')
-                                        // @ts-ignore
-                                        return language === 'es' ? (nextEvent.title_es || nextEvent.title) : (nextEvent.title_va || nextEvent.title)
-                                    })()}
-                                </h3>
-                                <div className="flex items-center gap-2 text-gray-300 text-sm">
-                                    <Clock className="w-4 h-4" />
-                                    <span>
-                                        {(() => {
-                                            const now = new Date()
-                                            const nextEvent = EVENTS.find(e => new Date(e.event_date) > now)
-                                            if (!nextEvent) return '-'
-                                            const date = new Date(nextEvent.event_date)
-                                            return date.toLocaleDateString(language === 'es' ? 'es-ES' : 'ca-ES', { day: 'numeric', month: 'long' })
-                                        })()}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Link
-                        to="/login"
-                        className="flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-red-600 text-white font-bold text-lg px-8 py-4 rounded-full hover:shadow-[0_0_40px_rgba(239,68,68,0.5)] transition-all transform hover:scale-105"
-                    >
-                        <Flame className="w-5 h-5" />
-                        <span>{t('home.cta')}</span>
-                    </Link>
-                    <Link
-                        to="/agenda"
-                        className="flex items-center justify-center gap-2 bg-white/5 text-white backdrop-blur-md border border-white/10 font-bold text-lg px-8 py-4 rounded-full hover:bg-white/10 transition-all hover:border-primary/50"
-                    >
-                        <span>{t('home.events_cta')}</span>
-                    </Link>
-                </div>
             </div>
 
             {/* Representatives Teaser */}
-            <div className="relative z-10 container mx-auto px-6 mb-20">
+            <div className="relative z-10 container mx-auto px-6 mb-12">
                 <div className="max-w-5xl mx-auto bg-surface-dark/50 backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-12 overflow-hidden relative group">
                     <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
                         <Crown size={200} />
@@ -138,6 +80,69 @@ export default function Home() {
                 </div>
             </div>
 
+            {/* Action Buttons */}
+            <div className="relative z-10 container mx-auto px-6 pb-20">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Link
+                        to="/login"
+                        className="flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-red-600 text-white font-bold text-lg px-8 py-4 rounded-full hover:shadow-[0_0_40px_rgba(239,68,68,0.5)] transition-all transform hover:scale-105"
+                    >
+                        <Flame className="w-5 h-5" />
+                        <span>{t('home.cta')}</span>
+                    </Link>
+                    <Link
+                        to="/agenda"
+                        className="flex items-center justify-center gap-2 bg-white/5 text-white backdrop-blur-md border border-white/10 font-bold text-lg px-8 py-4 rounded-full hover:bg-white/10 transition-all hover:border-primary/50"
+                    >
+                        <span>{t('home.events_cta')}</span>
+                    </Link>
+                </div>
+            </div>
+
+            {/* Next Event Teaser */}
+            <div className="relative z-10 container mx-auto px-6 mb-20">
+                <div className="max-w-md mx-auto transform hover:scale-105 transition-transform duration-300">
+                    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-red-600"></div>
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 bg-primary/20 rounded-xl">
+                                <CalendarIcon className="w-8 h-8 text-red-300" />
+                            </div>
+                            <div className="text-left">
+                                <span className="text-xs font-bold text-red-300 uppercase tracking-wider mb-1 block">
+                                    {t('home.next_event')}
+                                </span>
+                                <h3 className="text-xl font-bold text-white mb-2">
+                                    {(() => {
+                                        // Logic to find next event
+                                        const now = new Date()
+                                        // We use require here to avoid top-level import issues if circular, but standard import is better. 
+                                        // Ideally passed as prop or imported at top.
+                                        // Let's assume standard import at top.
+                                        const nextEvent = EVENTS.find(e => new Date(e.event_date) > now)
+                                        if (!nextEvent) return t('home.no_events')
+                                        // @ts-ignore
+                                        return language === 'es' ? (nextEvent.title_es || nextEvent.title) : (nextEvent.title_va || nextEvent.title)
+                                    })()}
+                                </h3>
+                                <div className="flex items-center gap-2 text-gray-300 text-sm">
+                                    <Clock className="w-4 h-4" />
+                                    <span>
+                                        {(() => {
+                                            const now = new Date()
+                                            const nextEvent = EVENTS.find(e => new Date(e.event_date) > now)
+                                            if (!nextEvent) return '-'
+                                            const date = new Date(nextEvent.event_date)
+                                            return date.toLocaleDateString(language === 'es' ? 'es-ES' : 'ca-ES', { day: 'numeric', month: 'long' })
+                                        })()}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Quick Links Section */}
             <div className="relative z-10 bg-surface-dark border-t border-white/5 py-20">
                 <div className="container mx-auto px-6">
@@ -163,6 +168,53 @@ export default function Home() {
                             <h3 className="text-2xl font-display font-bold text-white mb-2">{t('home.events_title')}</h3>
                             <p className="text-gray-400 text-sm">{t('home.events_cta')}</p>
                         </Link>
+                    </div>
+                </div>
+            </div>
+
+            {/* Contact Section */}
+            <div className="relative z-10 bg-background-dark border-t border-white/5 py-16">
+                <div className="container mx-auto px-6">
+                    <div className="max-w-4xl mx-auto text-center">
+                        <h2 className="text-3xl font-display font-bold text-white mb-8">Contacta con Nosotros</h2>
+                        <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
+                            {/* Email */}
+                            <a
+                                href="mailto:fallaturia@gmail.com"
+                                className="group flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-6 py-4 hover:bg-white/10 hover:border-primary/30 transition-all"
+                            >
+                                <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                                    <Mail className="w-5 h-5 text-primary" />
+                                </div>
+                                <span className="text-white font-medium">fallaturia@gmail.com</span>
+                            </a>
+
+                            {/* Facebook */}
+                            <a
+                                href="https://www.facebook.com/fallaturia/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-6 py-4 hover:bg-white/10 hover:border-blue-500/30 transition-all"
+                            >
+                                <div className="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 transition-colors">
+                                    <Facebook className="w-5 h-5 text-blue-500" />
+                                </div>
+                                <span className="text-white font-medium">Falla Turia</span>
+                            </a>
+
+                            {/* Instagram */}
+                            <a
+                                href="https://www.instagram.com/fallaturiajuntament/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-6 py-4 hover:bg-white/10 hover:border-pink-500/30 transition-all"
+                            >
+                                <div className="p-2 bg-pink-500/10 rounded-lg group-hover:bg-pink-500/20 transition-colors">
+                                    <Instagram className="w-5 h-5 text-pink-500" />
+                                </div>
+                                <span className="text-white font-medium">@fallaturiajuntament</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
