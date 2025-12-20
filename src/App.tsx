@@ -11,6 +11,7 @@ import Suggestions from '@/pages/Suggestions'
 import Representatives from '@/pages/Representatives'
 import Gallery from '@/pages/Gallery'
 import Dashboard from '@/pages/Dashboard'
+import ResetPassword from '@/pages/ResetPassword'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import FireBackground from '@/components/layout/FireBackground'
 
@@ -39,6 +40,7 @@ function App() {
                             {/* Public Routes */}
                             <Route path="/" element={<Home />} />
                             <Route path="/login" element={<Login />} />
+                            <Route path="/reset-password" element={<ResetPassword />} />
                             <Route path="/news" element={<News />} />
                             <Route path="/agenda" element={<Agenda />} />
                             <Route path="/lottery" element={<Lottery />} />

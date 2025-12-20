@@ -24,6 +24,8 @@ Plataforma web moderna para la Falla Turia que permite a los miembros de la comi
 - 🌍 **Multiidioma**: Español y Valenciano
 - 👤 **Perfil de Usuario**: Visualización del nombre completo en el navbar
 - 📝 **Registro Completo**: Formulario con nombre, apellidos, dirección y teléfono
+- 🔑 **Recuperación de Contraseña**: Sistema completo de reseteo de contraseña por email
+- 🔐 **Autenticación Segura**: Login seguro con Supabase Auth
 
 ### Para Administradores
 - 📊 **Dashboard Completo**: Panel de control administrativo

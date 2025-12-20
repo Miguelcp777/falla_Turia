@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { Flame, Lock, Mail, AlertCircle, ArrowRight, User, MapPin, Phone } from 'lucide-react'
+import { Flame, Lock, Mail, AlertCircle, ArrowRight, User, MapPin, Phone, KeyRound } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { supabase } from '@/lib/supabase'
 
 export default function Login() {
     const { signIn, signUp } = useAuth()
     const { t } = useLanguage()
     const navigate = useNavigate()
-    const [mode, setMode] = useState<'login' | 'register'>('login')
+    const [mode, setMode] = useState<'login' | 'register' | 'forgot-password'>('login')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [firstName, setFirstName] = useState('')
@@ -28,7 +29,7 @@ export default function Login() {
             if (mode === 'login') {
                 await signIn(email, password)
                 navigate('/')
-            } else {
+            } else if (mode === 'register') {
                 await signUp(email, password, {
                     first_name: firstName,
                     last_name: lastName,
@@ -42,6 +43,13 @@ export default function Login() {
                 setLastName('')
                 setAddress('')
                 setPhone('')
+            } else if (mode === 'forgot-password') {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/reset-password`,
+                })
+                if (error) throw error
+                setMessage('Te hemos enviado un correo con instrucciones para recuperar tu contraseña.')
+                setMode('login')
             }
         } catch (error: any) {
             setError(error.message || t('login.error_auth'))
@@ -60,10 +68,10 @@ export default function Login() {
                             <Flame className="w-8 h-8 text-primary" />
                         </div>
                         <h1 className="text-3xl font-display font-bold text-slate-900 dark:text-white mb-2">
-                            {mode === 'login' ? t('login.title') : 'Crear Cuenta'}
+                            {mode === 'login' ? t('login.title') : mode === 'register' ? 'Crear Cuenta' : 'Recuperar Contraseña'}
                         </h1>
                         <p className="text-slate-600 dark:text-gray-400">
-                            {mode === 'login' ? t('login.subtitle') : 'Únete a la Falla Turia'}
+                            {mode === 'login' ? t('login.subtitle') : mode === 'register' ? 'Únete a la Falla Turia' : 'Te enviaremos un enlace para resetear tu contraseña'}
                         </p>
                     </div>
 
@@ -156,21 +164,39 @@ export default function Login() {
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2 ml-1">{t('login.password')}</label>
-                            <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                                <input
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-12 py-3.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600"
-                                    placeholder="••••••••"
-                                    required
-                                    minLength={6}
-                                />
+                        {mode !== 'forgot-password' && (
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-gray-300 mb-2 ml-1">{t('login.password')}</label>
+                                <div className="relative">
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-12 py-3.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600"
+                                        placeholder="••••••••"
+                                        required
+                                        minLength={6}
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        )}
+
+                        {mode === 'login' && (
+                            <div className="flex justify-end mb-4">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setMode('forgot-password')
+                                        setError(null)
+                                        setMessage(null)
+                                    }}
+                                    className="text-sm text-primary hover:underline"
+                                >
+                                    ¿Olvidaste tu contraseña?
+                                </button>
+                            </div>
+                        )}
 
                         <button
                             type="submit"
@@ -181,7 +207,8 @@ export default function Login() {
                                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             ) : (
                                 <>
-                                    {mode === 'login' ? t('login.submit') : 'Registrarse'} <ArrowRight size={20} />
+                                    {mode === 'login' ? t('login.submit') : mode === 'register' ? 'Registrarse' : 'Enviar Enlace'}
+                                    {mode === 'forgot-password' ? <KeyRound size={20} /> : <ArrowRight size={20} />}
                                 </>
                             )}
                         </button>
@@ -189,17 +216,17 @@ export default function Login() {
 
                     <div className="mt-8 text-center pt-8 border-t border-slate-100 dark:border-white/5">
                         <p className="text-slate-500 dark:text-gray-500 text-sm">
-                            {mode === 'login' ? t('login.no_account') : '¿Ya tienes cuenta?'}
+                            {mode === 'forgot-password' ? '¿Recordaste tu contraseña?' : mode === 'login' ? t('login.no_account') : '¿Ya tienes cuenta?'}
                             <button
                                 type="button"
                                 onClick={() => {
-                                    setMode(mode === 'login' ? 'register' : 'login')
+                                    setMode(mode === 'forgot-password' ? 'login' : mode === 'login' ? 'register' : 'login')
                                     setError(null)
                                     setMessage(null)
                                 }}
                                 className="text-primary hover:underline font-bold ml-2"
                             >
-                                {mode === 'login' ? 'Regístrate aquí' : 'Inicia Sesión'}
+                                {mode === 'forgot-password' ? 'Volver al Login' : mode === 'login' ? 'Regístrate aquí' : 'Inicia Sesión'}
                             </button>
                         </p>
                     </div>
