@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: 239 68 68;
+    /* red-500 */
+    --color-primary-dark: 185 28 28;
+    /* red-700 */
+    --color-accent: 245 158 11;
+    /* amber-500 */
+    --color-background-light: 246 248 247;
+    --color-background-dark: 26 11 11;
+  }
+
+  body {
+    background-color: rgb(var(--color-background-dark));
+    color: white;
+  }
+}
