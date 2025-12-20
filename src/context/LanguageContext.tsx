@@ -14,10 +14,12 @@ export const translations = {
             suggestions: 'Buzón',
             suggestions_full: 'Buzón de Sugerencias',
             admin: 'Admin',
-            panel: 'Panel Admin',
+            panel: 'Panel de Gestión',
             login: 'Iniciar Sesión',
             logout: 'Cerrar Sesión',
-            access: 'Acceso Falleros'
+            access: 'Acceso Falleros',
+            representatives: 'Representantes',
+            gallery: 'Galería'
         },
         home: {
             title: 'Pasión, Fuego, Fiesta y Tradición',
@@ -94,6 +96,32 @@ export const translations = {
             blog_official: 'Blog Oficial',
             label_news: 'NOTICIA',
             empty: 'No hay noticias publicadas todavía.'
+        },
+        representatives: {
+            title: 'Nuestros Representantes',
+            subtitle: 'Conoce a las máximas figuras que representarán a nuestra comisión durante este ejercicio fallero.',
+            honor_roll: 'Cuadro de Honor',
+            cta: 'Conócelos',
+            roles: {
+                fallera_mayor: 'Fallera Mayor',
+                fallera_mayor_infantil: 'Fallera Mayor Infantil',
+                presidente: 'Presidente',
+                presidente_infantil: 'Presidente Infantil'
+            },
+            empty_name: 'Próximamente...',
+            empty_desc: 'Estamos preparando la presentación de nuestro representante.',
+            home_subtitle: 'Conoce a las máximas figuras de nuestra comisión. El orgullo y la tradición de la Falla Turia representados en ellos.'
+        },
+        gallery: {
+            title: 'Galería de Fotos',
+            subtitle: 'Momentos inolvidables de nuestra falla.',
+            empty: 'No hay fotos en la galería todavía.',
+            upload: 'Subir Foto',
+            delete: 'Eliminar',
+            title_label: 'Título (Opcional)',
+            uploading: 'Subiendo...',
+            success_upload: 'Foto subida correctamente',
+            item_count: 'Fotos'
         }
     },
     va: {
@@ -108,7 +136,9 @@ export const translations = {
             panel: 'Panell Admin',
             login: 'Iniciar Sessió',
             logout: 'Tancar Sessió',
-            access: 'Accés Fallers'
+            access: 'Accés Fallers',
+            representatives: 'Representants',
+            gallery: 'Galeria'
         },
         home: {
             title: 'Passió, Foc, Festa i Tradició',
@@ -185,6 +215,32 @@ export const translations = {
             blog_official: 'Blog Oficial',
             label_news: 'NOTÍCIA',
             empty: 'Encara no hi ha notícies publicades.'
+        },
+        representatives: {
+            title: 'Nostres Representants',
+            subtitle: 'Coneix les màximes figures que representaran a la nostra comissió durant aquest exercici faller.',
+            honor_roll: 'Quadre d\'Honor',
+            cta: 'Coneix-los',
+            roles: {
+                fallera_mayor: 'Fallera Major',
+                fallera_mayor_infantil: 'Fallera Major Infantil',
+                presidente: 'President',
+                presidente_infantil: 'President Infantil'
+            },
+            empty_name: 'Pròximament...',
+            empty_desc: 'Estem preparant la presentació del nostre representant.',
+            home_subtitle: 'Coneix les màximes figures de la nostra comissió. L\'orgull i la tradició de la Falla Turia representats en ells.'
+        },
+        gallery: {
+            title: 'Galeria de Fotos',
+            subtitle: 'Moments inoblidables de la nostra falla.',
+            empty: 'Encara no hi ha fotos a la galeria.',
+            upload: 'Pujar Foto',
+            delete: 'Eliminar',
+            title_label: 'Títol (Opcional)',
+            uploading: 'Pujant...',
+            success_upload: 'Foto pujada correctament',
+            item_count: 'Fotos'
         }
     }
 };

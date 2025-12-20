@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Calendar as CalendarIcon, Newspaper, ArrowRight, Flame, Clock } from 'lucide-react'
+import { Calendar as CalendarIcon, Newspaper, ArrowRight, Flame, Clock, Crown } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import Countdown from '@/components/ui/Countdown'
 import { EVENTS } from '@/data/events'
@@ -16,15 +16,13 @@ export default function Home() {
                 </div>
             </div>
 
-
-
             {/* Hero Section */}
             <div className="absolute inset-0 z-0">
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] animate-pulse-slow"></div>
                 <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
             </div>
 
-            <div className="relative z-10 container mx-auto px-6 pt-20 pb-32 text-center">
+            <div className="relative z-10 container mx-auto px-6 pt-20 pb-20 text-center">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 backdrop-blur-sm border border-primary/20 mb-8 animate-fire-flicker">
                     <img src="/escudo.jpg" alt="Escudo" className="w-5 h-5 object-contain rounded-full" />
                     <span className="text-sm font-bold text-red-200 tracking-wide uppercase">Falles 2026</span>
@@ -96,6 +94,47 @@ export default function Home() {
                     >
                         <span>{t('home.events_cta')}</span>
                     </Link>
+                </div>
+            </div>
+
+            {/* Representatives Teaser */}
+            <div className="relative z-10 container mx-auto px-6 mb-20">
+                <div className="max-w-5xl mx-auto bg-surface-dark/50 backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-12 overflow-hidden relative group">
+                    <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                        <Crown size={200} />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center relative z-10">
+                        <div className="order-2 md:order-1 text-left">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-sm font-bold uppercase tracking-wider mb-6">
+                                <Crown size={14} />
+                                <span>{t('representatives.honor_roll')}</span>
+                            </div>
+                            <h2 className="text-4xl font-display font-bold text-white mb-6 leading-tight">
+                                {t('representatives.title')} <span className="text-secondary">2026</span>
+                            </h2>
+                            <p className="text-gray-300 mb-8 text-lg font-light leading-relaxed">
+                                {t('representatives.home_subtitle')}
+                            </p>
+                            <Link
+                                to="/representatives"
+                                className="inline-flex items-center gap-2 bg-secondary hover:bg-secondary-dark text-white font-bold px-8 py-3 rounded-xl transition-all shadow-lg shadow-secondary/20 hover:scale-105"
+                            >
+                                <span>{t('representatives.cta')}</span>
+                                <ArrowRight size={20} />
+                            </Link>
+                        </div>
+                        <div className="order-1 md:order-2">
+                            <div className="aspect-[4/3] rounded-2xl overflow-hidden border-4 border-white/10 shadow-2xl relative group-hover:border-secondary/30 transition-colors">
+                                <img
+                                    src="/representantes_group.jpg"
+                                    alt="Representantes 2026"
+                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

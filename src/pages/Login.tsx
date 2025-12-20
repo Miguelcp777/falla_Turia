@@ -5,23 +5,32 @@ import { Flame, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 
 export default function Login() {
-    const { signIn } = useAuth()
+    const { signIn, signUp } = useAuth()
     const { t } = useLanguage()
     const navigate = useNavigate()
+    const [mode, setMode] = useState<'login' | 'register'>('login')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [message, setMessage] = useState<string | null>(null)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
         setError(null)
+        setMessage(null)
         try {
-            await signIn(email, password)
-            navigate('/')
-        } catch (error) {
-            setError(t('login.error_auth'))
+            if (mode === 'login') {
+                await signIn(email, password)
+                navigate('/')
+            } else {
+                await signUp(email, password)
+                setMessage('¡Cuenta creada! Revisa tu email o inicia sesión.')
+                setMode('login')
+            }
+        } catch (error: any) {
+            setError(error.message || t('login.error_auth'))
         } finally {
             setLoading(false)
         }
@@ -36,14 +45,24 @@ export default function Login() {
                         <div className="inline-flex p-4 bg-primary/10 rounded-full mb-4 animate-pulse-slow">
                             <Flame className="w-8 h-8 text-primary" />
                         </div>
-                        <h1 className="text-3xl font-display font-bold text-slate-900 dark:text-white mb-2">{t('login.title')}</h1>
-                        <p className="text-slate-600 dark:text-gray-400">{t('login.subtitle')}</p>
+                        <h1 className="text-3xl font-display font-bold text-slate-900 dark:text-white mb-2">
+                            {mode === 'login' ? t('login.title') : 'Crear Cuenta'}
+                        </h1>
+                        <p className="text-slate-600 dark:text-gray-400">
+                            {mode === 'login' ? t('login.subtitle') : 'Únete a la Falla Turia'}
+                        </p>
                     </div>
 
                     {error && (
                         <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl flex items-center gap-2 text-sm">
                             <AlertCircle size={16} />
                             {error}
+                        </div>
+                    )}
+
+                    {message && (
+                        <div className="mb-6 bg-green-500/10 border border-green-500/20 text-green-500 p-4 rounded-xl text-center text-sm font-bold">
+                            {message}
                         </div>
                     )}
 
@@ -74,6 +93,7 @@ export default function Login() {
                                     className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-12 py-3.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600"
                                     placeholder="••••••••"
                                     required
+                                    minLength={6}
                                 />
                             </div>
                         </div>
@@ -87,7 +107,7 @@ export default function Login() {
                                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             ) : (
                                 <>
-                                    {t('login.submit')} <ArrowRight size={20} />
+                                    {mode === 'login' ? t('login.submit') : 'Registrarse'} <ArrowRight size={20} />
                                 </>
                             )}
                         </button>
@@ -95,7 +115,18 @@ export default function Login() {
 
                     <div className="mt-8 text-center pt-8 border-t border-slate-100 dark:border-white/5">
                         <p className="text-slate-500 dark:text-gray-500 text-sm">
-                            {t('login.no_account')} <a href="#" className="text-primary hover:underline font-bold">{t('login.contact')}</a>
+                            {mode === 'login' ? t('login.no_account') : '¿Ya tienes cuenta?'}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setMode(mode === 'login' ? 'register' : 'login')
+                                    setError(null)
+                                    setMessage(null)
+                                }}
+                                className="text-primary hover:underline font-bold ml-2"
+                            >
+                                {mode === 'login' ? 'Regístrate aquí' : 'Inicia Sesión'}
+                            </button>
                         </p>
                     </div>
                 </div>

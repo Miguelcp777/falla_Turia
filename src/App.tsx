@@ -8,6 +8,8 @@ import News from '@/pages/News'
 import Agenda from '@/pages/Agenda'
 import Lottery from '@/pages/Lottery'
 import Suggestions from '@/pages/Suggestions'
+import Representatives from '@/pages/Representatives'
+import Gallery from '@/pages/Gallery'
 import Dashboard from '@/pages/Dashboard'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import FireBackground from '@/components/layout/FireBackground'
@@ -40,14 +42,16 @@ function App() {
                             <Route path="/news" element={<News />} />
                             <Route path="/agenda" element={<Agenda />} />
                             <Route path="/lottery" element={<Lottery />} />
+                            <Route path="/representatives" element={<Representatives />} />
+                            <Route path="/gallery" element={<Gallery />} />
 
-                            {/* Member Routes */}
-                            <Route element={<ProtectedRoute allowedRoles={['standard', 'admin']} />}>
+                            {/* Member Routes - Accessible by all authenticated users */}
+                            <Route element={<ProtectedRoute allowedRoles={['subscriber', 'author', 'editor', 'admin']} />}>
                                 <Route path="/suggestions" element={<Suggestions />} />
                             </Route>
 
-                            {/* Admin Routes */}
-                            <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+                            {/* Admin/Content Routes */}
+                            <Route element={<ProtectedRoute allowedRoles={['admin', 'editor', 'author']} />}>
                                 <Route path="/admin" element={<Dashboard />} />
                             </Route>
                         </Routes>

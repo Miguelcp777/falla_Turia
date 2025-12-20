@@ -1,8 +1,9 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { UserRole } from '@/lib/supabase'
 
 type ProtectedRouteProps = {
-    allowedRoles?: ('anon' | 'standard' | 'admin')[]
+    allowedRoles?: UserRole[]
 }
 
 export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
@@ -20,7 +21,8 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
         return <Navigate to="/login" replace />
     }
 
-    if (allowedRoles && !allowedRoles.includes(role)) {
+    if (allowedRoles && role && !allowedRoles.includes(role)) {
+        // If user doesn't have required role, redirect to home or unauthorized page
         return <Navigate to="/" replace />
     }
 

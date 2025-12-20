@@ -5,7 +5,7 @@ import { Menu, X, LogOut, Shield } from 'lucide-react'
 import { useState } from 'react'
 
 export default function Navbar() {
-    const { user, isAdmin, isStandard, signOut } = useAuth()
+    const { user, checkPermission, signOut } = useAuth()
     const { language, setLanguage, t } = useLanguage()
     const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false)
@@ -41,11 +41,18 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
                     <div className="flex items-center gap-3">
-                        <Link to="/" className="flex items-center gap-2 group">
-                            <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
-                                <img src="/escudo.jpg" alt="Falla Turia" className="w-8 h-8 object-contain rounded-full" />
+                        <Link to="/" className="flex items-center gap-4 group">
+                            <div className="relative w-14 h-14 min-w-[3.5rem] rounded-full overflow-hidden flex-shrink-0 border-2 border-white/10 shadow-lg bg-white/5">
+                                <img src="/escudo.jpg" alt="Falla Turia" className="w-full h-full object-cover" />
                             </div>
-                            <span className="text-white font-display font-bold text-xl tracking-tight hidden sm:block">Falla Turia - Plaça de l' Ajuntament</span>
+                            <div className="flex flex-col hidden sm:flex justify-center items-start h-12">
+                                <span className="text-white font-display font-bold text-base leading-none tracking-wide group-hover:text-primary transition-colors whitespace-nowrap">
+                                    Falla Turia
+                                </span>
+                                <span className="text-white font-display font-bold text-base leading-none tracking-wide group-hover:text-primary transition-colors whitespace-nowrap">
+                                    Plaça de l' Ajuntament
+                                </span>
+                            </div>
                         </Link>
                     </div>
 
@@ -63,17 +70,23 @@ export default function Navbar() {
                             <Link to="/lottery" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
                                 {t('nav.lottery')}
                             </Link>
+                            <Link to="/representatives" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                {t('nav.representatives')}
+                            </Link>
+                            <Link to="/gallery" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                {t('nav.gallery')}
+                            </Link>
 
-                            {isStandard && (
+                            {checkPermission(['subscriber', 'author', 'editor', 'admin']) && (
                                 <Link to="/suggestions" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
                                     {t('nav.suggestions')}
                                 </Link>
                             )}
 
-                            {isAdmin && (
+                            {checkPermission(['admin', 'editor', 'author']) && (
                                 <Link to="/admin" className="bg-primary/10 text-primary hover:bg-primary/20 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2">
                                     <Shield size={16} />
-                                    {t('nav.admin')}
+                                    {t('nav.panel')}
                                 </Link>
                             )}
                         </div>
@@ -143,10 +156,12 @@ export default function Navbar() {
                         <Link to="/news" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.news')}</Link>
                         <Link to="/agenda" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.agenda')}</Link>
                         <Link to="/lottery" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.lottery')}</Link>
-                        {isStandard && (
+                        <Link to="/representatives" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.representatives')}</Link>
+                        <Link to="/gallery" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.gallery')}</Link>
+                        {checkPermission(['subscriber', 'author', 'editor', 'admin']) && (
                             <Link to="/suggestions" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.suggestions_full')}</Link>
                         )}
-                        {isAdmin && (
+                        {checkPermission(['admin', 'editor', 'author']) && (
                             <Link to="/admin" className="text-primary hover:text-red-400 block px-3 py-2 rounded-md text-base font-medium font-bold">{t('nav.panel')}</Link>
                         )}
 
