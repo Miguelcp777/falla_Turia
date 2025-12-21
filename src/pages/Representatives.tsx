@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Crown, Loader, Sparkles } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import FireBackground from '@/components/layout/FireBackground'

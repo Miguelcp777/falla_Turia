@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment, FormEvent } from 'react'
 import { supabase, Profile, UserRole } from '@/lib/supabase'
-import { Flame, Calendar, Newspaper, Plus, Upload, Clover, Save, Users, Shield, CheckCircle, XCircle, Trash2, Edit2 as Edit, X, Crown, Image as ImageIcon } from 'lucide-react'
+import { Flame, Calendar, Newspaper, Plus, Upload, Clover, Save, Users, Shield, CheckCircle, XCircle, Trash2, Edit2 as Edit, X, Crown, Image as ImageIcon, ShoppingBag } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 
-type Tab = 'news' | 'agenda' | 'lottery' | 'users' | 'representatives' | 'gallery'
+type Tab = 'news' | 'agenda' | 'lottery' | 'users' | 'representatives' | 'gallery' | 'clothing'
 
 export default function Dashboard() {
     const { role } = useAuth()
@@ -48,6 +48,24 @@ export default function Dashboard() {
     const [editingUserId, setEditingUserId] = useState<string | null>(null)
     const [editingUserData, setEditingUserData] = useState<Partial<Profile>>({})
 
+    // Clothing & Orders
+    const [clothingItems, setClothingItems] = useState<any[]>([])
+    const [clothingOrders, setClothingOrders] = useState<any[]>([])
+    const [clothingSubTab, setClothingSubTab] = useState<'products' | 'orders'>('products')
+
+    // Clothing Form
+    const [editingClothingId, setEditingClothingId] = useState<string | null>(null)
+    const [clothingForm, setClothingForm] = useState({
+        name: '',
+        description: '',
+        price: '',
+        sizes: '', // comma separated
+        image_url: '',
+        display_order: 0,
+        active: true
+    })
+    const [clothingImageFile, setClothingImageFile] = useState<File | null>(null)
+
     useEffect(() => {
         if (activeTab === 'lottery') {
             fetchLotteryConfig()
@@ -61,6 +79,9 @@ export default function Dashboard() {
             fetchRepresentatives()
         } else if (activeTab === 'gallery') {
             fetchGallery()
+        } else if (activeTab === 'clothing') {
+            fetchClothingItems()
+            fetchOrders()
         }
     }, [activeTab, role])
 
@@ -117,6 +138,30 @@ export default function Dashboard() {
         if (data) setGalleryList(data)
     }
 
+    const fetchClothingItems = async () => {
+        const { data } = await supabase
+            .from('clothing_items')
+            .select('*')
+            .order('display_order', { ascending: true })
+            .order('created_at', { ascending: false })
+        if (data) setClothingItems(data)
+    }
+
+    const fetchOrders = async () => {
+        const { data } = await supabase
+            .from('clothing_orders')
+            .select(`
+                *,
+                profiles (first_name, last_name, email, phone),
+                clothing_order_items (
+                    *,
+                    clothing_items (name)
+                )
+            `)
+            .order('created_at', { ascending: false })
+        if (data) setClothingOrders(data)
+    }
+
     const fetchLotteryConfig = async () => {
         const { data, error } = await supabase
             .from('lottery_config')
@@ -156,7 +201,7 @@ export default function Dashboard() {
         return data.publicUrl
     }
 
-    const handleCreateNews = async (e: React.FormEvent) => {
+    const handleCreateNews = async (e: FormEvent) => {
         e.preventDefault()
         setLoading(true)
 
@@ -218,7 +263,7 @@ export default function Dashboard() {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
-    const handleCreateAgenda = async (e: React.FormEvent) => {
+    const handleCreateAgenda = async (e: FormEvent) => {
         e.preventDefault()
         setLoading(true)
         try {
@@ -275,7 +320,7 @@ export default function Dashboard() {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
-    const handleUpdateLottery = async (e: React.FormEvent) => {
+    const handleUpdateLottery = async (e: FormEvent) => {
         e.preventDefault()
         setLoading(true)
         try {
@@ -437,7 +482,7 @@ export default function Dashboard() {
         }
     }
 
-    const handleGalleryUpload = async (e: React.FormEvent) => {
+    const handleGalleryUpload = async (e: FormEvent) => {
         e.preventDefault()
         if (galleryUploadFiles.length === 0) return
 
@@ -504,6 +549,60 @@ export default function Dashboard() {
         } catch (error: any) {
             alert('Error eliminando foto: ' + error.message)
         }
+    }
+
+
+    const handleCreateClothing = async (e: FormEvent) => {
+        e.preventDefault()
+        setLoading(true)
+        try {
+            let finalImageUrl = clothingForm.image_url
+            if (clothingImageFile) {
+                finalImageUrl = await handleImageUpload(clothingImageFile)
+            }
+
+            const itemData = {
+                name: clothingForm.name,
+                description: clothingForm.description,
+                price: parseFloat(clothingForm.price),
+                sizes: clothingForm.sizes.split(',').map(s => s.trim().toUpperCase()).filter(s => s),
+                image_url: finalImageUrl,
+                display_order: clothingForm.display_order || 0,
+                active: clothingForm.active
+            }
+
+            if (editingClothingId) {
+                const { error } = await supabase.from('clothing_items').update(itemData).eq('id', editingClothingId)
+                if (error) throw error
+                alert('Prenda actualizada')
+            } else {
+                const { error } = await supabase.from('clothing_items').insert(itemData)
+                if (error) throw error
+                alert('Prenda creada')
+            }
+
+            setClothingForm({ name: '', description: '', price: '', sizes: '', image_url: '', display_order: 0, active: true })
+            setClothingImageFile(null)
+            setEditingClothingId(null)
+            fetchClothingItems()
+        } catch (error: any) {
+            alert('Error: ' + error.message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleDeleteClothing = async (id: string) => {
+        if (!confirm('¿Eliminar esta prenda?')) return
+        const { error } = await supabase.from('clothing_items').delete().eq('id', id)
+        if (error) alert('Error: ' + error.message)
+        else fetchClothingItems()
+    }
+
+    const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
+        const { error } = await supabase.from('clothing_orders').update({ status: newStatus }).eq('id', orderId)
+        if (error) alert('Error: ' + error.message)
+        else fetchOrders()
     }
 
     return (
@@ -586,6 +685,16 @@ export default function Dashboard() {
                             Representantes
                         </button>
                     )}
+                    <button
+                        onClick={() => setActiveTab('clothing')}
+                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'clothing'
+                            ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                            : 'bg-surface-dark text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}
+                    >
+                        <ShoppingBag size={20} />
+                        Ropa
+                    </button>
                 </div>
 
                 <div className="bg-surface-dark border border-white/5 rounded-3xl p-8 shadow-xl">
@@ -641,7 +750,7 @@ export default function Dashboard() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Imagen Destacada</label>
                                     <div className="space-y-4">
-                                        <div className={`border-2 border-dashed border-white/10 rounded-xl p-8 text-center transition-colors ${newsImageFile ? 'bg-primary/5 border-primary/30' : 'hover:bg-white/5'}`}>
+                                        <div className={`border - 2 border - dashed border - white / 10 rounded - xl p - 8 text - center transition - colors ${newsImageFile ? 'bg-primary/5 border-primary/30' : 'hover:bg-white/5'} `}>
                                             <input
                                                 type="file"
                                                 id="news-image-upload"
@@ -656,7 +765,7 @@ export default function Dashboard() {
                                                 className="hidden"
                                             />
                                             <label htmlFor="news-image-upload" className="cursor-pointer flex flex-col items-center gap-2">
-                                                <Upload className={`w-8 h-8 ${newsImageFile ? 'text-primary' : 'text-gray-400'}`} />
+                                                <Upload className={`w - 8 h - 8 ${newsImageFile ? 'text-primary' : 'text-gray-400'} `} />
                                                 <span className="text-sm font-medium text-gray-300">
                                                     {newsImageFile ? newsImageFile.name : 'Haz clic para subir una imagen'}
                                                 </span>
@@ -949,7 +1058,7 @@ export default function Dashboard() {
                                     </thead>
                                     <tbody className="divide-y divide-white/5">
                                         {allUsers.map((user) => (
-                                            <React.Fragment key={user.id}>
+                                            <Fragment key={user.id}>
                                                 <tr className="hover:bg-white/5 transition-colors">
                                                     <td className="py-4 px-4">
                                                         <div className="text-white font-medium">{user.email}</div>
@@ -958,7 +1067,7 @@ export default function Dashboard() {
                                                     <td className="py-4 px-4">
                                                         <div className="text-white">
                                                             {user.first_name && user.last_name
-                                                                ? `${user.first_name} ${user.last_name}`
+                                                                ? `${user.first_name} ${user.last_name} `
                                                                 : <span className="text-gray-500 italic">Sin datos</span>
                                                             }
                                                         </div>
@@ -983,10 +1092,10 @@ export default function Dashboard() {
                                                             <button
                                                                 onClick={() => handleToggleActive(user.id, user.active !== false)}
                                                                 title={user.active !== false ? "Desactivar usuario" : "Activar usuario"}
-                                                                className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold transition-all ${user.active !== false
+                                                                className={`flex items - center gap - 2 px - 3 py - 1 rounded - full text - xs font - bold transition - all ${user.active !== false
                                                                     ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
                                                                     : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                                                                    }`}
+                                                                    } `}
                                                             >
                                                                 {user.active !== false ? <CheckCircle size={14} /> : <XCircle size={14} />}
                                                             </button>
@@ -1080,7 +1189,7 @@ export default function Dashboard() {
                                                         </td>
                                                     </tr>
                                                 )}
-                                            </React.Fragment>
+                                            </Fragment>
                                         ))}
                                     </tbody>
                                 </table>
@@ -1112,7 +1221,7 @@ export default function Dashboard() {
                                 <form onSubmit={handleGalleryUpload} className="space-y-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-400 mb-2">Imágenes (Selecciona una o varias)</label>
-                                        <div className={`border-2 border-dashed border-white/10 rounded-xl p-8 text-center transition-colors ${galleryUploadFiles.length > 0 ? 'bg-primary/5 border-primary/30' : 'hover:bg-white/5'}`}>
+                                        <div className={`border - 2 border - dashed border - white / 10 rounded - xl p - 8 text - center transition - colors ${galleryUploadFiles.length > 0 ? 'bg-primary/5 border-primary/30' : 'hover:bg-white/5'} `}>
                                             <input
                                                 type="file"
                                                 id="gallery-upload"
@@ -1127,7 +1236,7 @@ export default function Dashboard() {
                                                 className="hidden"
                                             />
                                             <label htmlFor="gallery-upload" className="cursor-pointer flex flex-col items-center gap-2">
-                                                <Upload className={`w-8 h-8 ${galleryUploadFiles.length > 0 ? 'text-primary' : 'text-gray-400'}`} />
+                                                <Upload className={`w - 8 h - 8 ${galleryUploadFiles.length > 0 ? 'text-primary' : 'text-gray-400'} `} />
                                                 <span className="text-sm font-medium text-gray-300">
                                                     {galleryUploadFiles.length > 0
                                                         ? `${galleryUploadFiles.length} archivos seleccionados`
@@ -1183,6 +1292,242 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         </div>
+
+                    )}
+
+                    {activeTab === 'clothing' && (
+                        <div>
+                            <div className="flex gap-4 mb-8 border-b border-white/10 pb-4">
+                                <button
+                                    onClick={() => setClothingSubTab('products')}
+                                    className={`px - 4 py - 2 rounded - lg font - bold transition - colors ${clothingSubTab === 'products' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'} `}
+                                >
+                                    Productos
+                                </button>
+                                <button
+                                    onClick={() => setClothingSubTab('orders')}
+                                    className={`px - 4 py - 2 rounded - lg font - bold transition - colors ${clothingSubTab === 'orders' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'} `}
+                                >
+                                    Pedidos
+                                </button>
+                            </div>
+
+                            {clothingSubTab === 'products' ? (
+                                <>
+                                    <form onSubmit={handleCreateClothing} className="space-y-6 max-w-2xl mb-12">
+                                        <h3 className="text-xl font-bold text-white mb-4">{editingClothingId ? 'Editar Prenda' : 'Nueva Prenda'}</h3>
+                                        {/* Name */}
+                                        <div>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={clothingForm.name}
+                                                onChange={e => setClothingForm({ ...clothingForm, name: e.target.value })}
+                                                placeholder="Nombre de la prenda"
+                                                className="w-full bg-background-dark border border-white/10 rounded-xl py-3 px-4 text-white focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                        {/* Description */}
+                                        <div>
+                                            <textarea
+                                                value={clothingForm.description}
+                                                onChange={e => setClothingForm({ ...clothingForm, description: e.target.value })}
+                                                placeholder="Descripción"
+                                                className="w-full bg-background-dark border border-white/10 rounded-xl py-3 px-4 text-white focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-4">
+                                            <div className="col-span-1">
+                                                <label className="block text-sm font-medium text-gray-400 mb-1">Precio (€)</label>
+                                                <input
+                                                    type="number"
+                                                    required
+                                                    step="0.01"
+                                                    value={clothingForm.price}
+                                                    onChange={e => setClothingForm({ ...clothingForm, price: e.target.value })}
+                                                    placeholder="0.00"
+                                                    className="w-full bg-background-dark border border-white/10 rounded-xl py-3 px-4 text-white focus:border-primary focus:outline-none"
+                                                />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <label className="block text-sm font-medium text-gray-400 mb-1">Orden</label>
+                                                <input
+                                                    type="number"
+                                                    value={clothingForm.display_order || 0}
+                                                    onChange={e => setClothingForm({ ...clothingForm, display_order: parseInt(e.target.value) || 0 })}
+                                                    placeholder="0"
+                                                    className="w-full bg-background-dark border border-white/10 rounded-xl py-3 px-4 text-white focus:border-primary focus:outline-none"
+                                                />
+                                            </div>
+                                            <div className="col-span-1 flex items-end">
+                                                <label className="flex items-center gap-2 text-sm font-medium text-gray-400 mb-4 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={clothingForm.active}
+                                                        onChange={e => setClothingForm({ ...clothingForm, active: e.target.checked })}
+                                                        className="w-5 h-5 rounded border-gray-600 text-primary focus:ring-primary bg-background-dark"
+                                                    />
+                                                    Visible en web
+                                                </label>
+                                            </div>
+                                            <div className="col-span-3">
+                                                <label className="block text-sm font-medium text-gray-400 mb-1">Tallas</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={clothingForm.sizes}
+                                                    onChange={e => setClothingForm({ ...clothingForm, sizes: e.target.value })}
+                                                    placeholder="S, M, L..."
+                                                    className="w-full bg-background-dark border border-white/10 rounded-xl py-3 px-4 text-white focus:border-primary focus:outline-none"
+                                                />
+                                            </div>
+                                        </div>
+                                        {/* Image Upload */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-400 mb-2">Imagen</label>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={e => setClothingImageFile(e.target.files?.[0] || null)}
+                                                className="text-gray-400"
+                                            />
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            disabled={loading}
+                                            className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-primary/20 transition-all disabled:opacity-50"
+                                        >
+                                            {editingClothingId ? <Save size={20} /> : <Plus size={20} />}
+                                            {loading ? 'Guardando...' : editingClothingId ? 'Actualizar Prenda' : 'Añadir Prenda'}
+                                        </button>
+                                        {editingClothingId && (
+                                            <div className="mt-4 mb-4 p-3 bg-blue-500/20 text-blue-300 rounded-lg flex items-center justify-between">
+                                                <span>Editando prenda existente</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setEditingClothingId(null)
+                                                        setClothingForm({ name: '', description: '', price: '', sizes: '', image_url: '', display_order: 0, active: true })
+                                                        setClothingImageFile(null)
+                                                    }}
+                                                    className="text-sm hover:underline"
+                                                >
+                                                    Cancelar
+                                                </button>
+                                            </div>
+                                        )}
+                                    </form>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {clothingItems.map(item => (
+                                            <div key={item.id} className={`bg-background-dark border ${item.active ? 'border-white/10' : 'border-red-500/30'} rounded-xl p-4 flex gap-4 opacity-${item.active ? '100' : '75'}`}>
+                                                {item.image_url ? (
+                                                    <img src={item.image_url} alt={item.name} className="w-20 h-20 object-cover rounded-lg bg-white/5" />
+                                                ) : (
+                                                    <div className="w-20 h-20 bg-white/5 rounded-lg flex items-center justify-center">
+                                                        <ShoppingBag className="text-gray-600" size={24} />
+                                                    </div>
+                                                )}
+                                                <div className="flex-1">
+                                                    <div className="flex justify-between items-start">
+                                                        <h4 className="text-white font-bold">{item.name}</h4>
+                                                        <span className="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded">Ord: {item.display_order}</span>
+                                                    </div>
+                                                    <p className="text-primary font-bold">{item.price}€</p>
+                                                    <p className="text-xs text-gray-400">{item.sizes?.join(', ')}</p>
+                                                    {!item.active && <p className="text-xs text-red-400 font-bold mt-1">Oculto</p>}
+                                                    <div className="flex gap-2 mt-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                setEditingClothingId(item.id)
+                                                                setClothingForm({
+                                                                    name: item.name,
+                                                                    description: item.description || '',
+                                                                    price: item.price,
+                                                                    sizes: item.sizes?.join(', ') || '',
+                                                                    image_url: item.image_url,
+                                                                    display_order: item.display_order || 0,
+                                                                    active: item.active !== false // default to true if undefined
+                                                                })
+                                                                window.scrollTo({ top: 0, behavior: 'smooth' })
+                                                            }}
+                                                            className="p-2 hover:bg-white/10 rounded-lg text-blue-400 transition-colors"
+                                                        >
+                                                            <Edit size={18} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteClothing(item.id)}
+                                                            className="p-2 hover:bg-white/10 rounded-lg text-red-400 transition-colors"
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="space-y-4">
+                                    {clothingOrders.map(order => (
+                                        <div key={order.id} className="bg-background-dark border border-white/10 rounded-xl p-6">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <h4 className="text-lg font-bold text-white mb-1">
+                                                        Pedido #{order.id.slice(0, 8)}
+                                                    </h4>
+                                                    <p className="text-gray-400 text-sm">
+                                                        {new Date(order.created_at).toLocaleString()}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 mt-2 text-sm text-gray-300">
+                                                        <Users size={14} />
+                                                        {order.profiles?.first_name} {order.profiles?.last_name} ({order.profiles?.email})
+                                                        {order.profiles?.phone && ` - 📞 ${order.profiles.phone} `}
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-2xl font-bold text-primary">{order.total_amount}€</p>
+                                                    <select
+                                                        value={order.status}
+                                                        onChange={e => handleUpdateOrderStatus(order.id, e.target.value)}
+                                                        className={`mt - 2 text - sm font - bold bg - transparent border rounded px - 2 py - 1 ${order.status === 'delivered' ? 'text-green-400 border-green-400' :
+                                                            order.status === 'paid' ? 'text-blue-400 border-blue-400' :
+                                                                'text-orange-400 border-orange-400'
+                                                            } `}
+                                                    >
+                                                        <option value="pending" className="bg-background-dark text-gray-300">Pendiente</option>
+                                                        <option value="paid" className="bg-background-dark text-gray-300">Pagado</option>
+                                                        <option value="delivered" className="bg-background-dark text-gray-300">Entregado</option>
+                                                        <option value="cancelled" className="bg-background-dark text-gray-300">Cancelado</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div className="bg-black/20 rounded-lg p-4">
+                                                {order.clothing_order_items?.map((item: any) => (
+                                                    <div key={item.id} className="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="bg-white/10 w-8 h-8 rounded flex items-center justify-center text-xs text-center font-bold">
+                                                                {item.quantity}x
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-white text-sm font-medium">{item.clothing_items?.name}</p>
+                                                                <p className="text-xs text-gray-500">Talla: {item.size}</p>
+                                                            </div>
+                                                        </div>
+                                                        <p className="text-white font-medium">{item.unit_price}€</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {clothingOrders.length === 0 && (
+                                        <p className="text-center text-gray-500 py-12">No hay pedidos registrados</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>
@@ -1213,7 +1558,7 @@ function RepresentativeCard({ rep, onUpdate, loading }: { rep: any, onUpdate: an
         }
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         onUpdate(e, rep.id, name, desc, imageFile, previewUrl)
     }
 
@@ -1227,7 +1572,7 @@ function RepresentativeCard({ rep, onUpdate, loading }: { rep: any, onUpdate: an
             <div className="space-y-4">
                 {/* Image Upload Area */}
                 <div className="flex gap-4">
-                    <div className={`relative w-24 h-24 rounded-xl overflow-hidden bg-white/5 border border-white/10 flex-shrink-0 group`}>
+                    <div className={`relative w - 24 h - 24 rounded - xl overflow - hidden bg - white / 5 border border - white / 10 flex - shrink - 0 group`}>
                         {previewUrl ? (
                             <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                         ) : (

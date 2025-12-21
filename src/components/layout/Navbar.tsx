@@ -1,12 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { Menu, X, LogOut, Shield, User } from 'lucide-react'
+import { useCart } from '@/context/CartContext'
+import { Menu, X, LogOut, Shield, User, ShoppingBag } from 'lucide-react'
 import { useState } from 'react'
 
 export default function Navbar() {
     const { user, profile, checkPermission, signOut } = useAuth()
     const { language, setLanguage, t } = useLanguage()
+    const { items, setIsOpen: setIsCartOpen } = useCart()
     const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false)
 
@@ -76,6 +78,9 @@ export default function Navbar() {
                             <Link to="/gallery" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
                                 {t('nav.gallery')}
                             </Link>
+                            <Link to="/clothing" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                Ropa
+                            </Link>
 
                             {checkPermission(['subscriber', 'author', 'editor', 'admin']) && (
                                 <Link to="/suggestions" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
@@ -93,6 +98,19 @@ export default function Navbar() {
                     </div>
 
                     <div className="hidden md:flex items-center gap-6">
+                        {/* Cart */}
+                        <button
+                            onClick={() => setIsCartOpen(true)}
+                            className="relative p-2 text-gray-300 hover:text-primary transition-colors"
+                        >
+                            <ShoppingBag size={20} />
+                            {items.length > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-background-dark">
+                                    {items.length}
+                                </span>
+                            )}
+                        </button>
+
                         {/* Language Switcher */}
                         <div className="flex items-center gap-2 bg-surface-dark border border-white/10 rounded-full p-1">
                             <button
@@ -167,6 +185,7 @@ export default function Navbar() {
                         <Link to="/lottery" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.lottery')}</Link>
                         <Link to="/representatives" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.representatives')}</Link>
                         <Link to="/gallery" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.gallery')}</Link>
+                        <Link to="/clothing" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Ropa</Link>
                         {checkPermission(['subscriber', 'author', 'editor', 'admin']) && (
                             <Link to="/suggestions" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.suggestions_full')}</Link>
                         )}
