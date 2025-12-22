@@ -77,7 +77,7 @@ export default function CartDrawer() {
                         <div className="space-y-3">
                             <button
                                 onClick={() => checkout().catch(err => alert(err.message))}
-                                className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all flex items-center justify-center gap-2"
+                                className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-[0_0_30px_rgba(239,68,68,0.5)] transition-all duration-300 transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
                             >
                                 Confirmar Pedido
                             </button>

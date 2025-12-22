@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useCart } from '@/context/CartContext'
@@ -10,7 +10,14 @@ export default function Navbar() {
     const { language, setLanguage, t } = useLanguage()
     const { items, setIsOpen: setIsCartOpen } = useCart()
     const navigate = useNavigate()
+    const location = useLocation()
     const [isOpen, setIsOpen] = useState(false)
+
+    const isActive = (path: string) => location.pathname === path
+    const navLinkClass = (path: string) => `px-3 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${isActive(path)
+        ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] scale-105'
+        : 'text-gray-300 hover:text-white hover:bg-white/10 hover:shadow-[0_0_10px_rgba(239,68,68,0.2)]'
+        }`
 
     const handleSignOut = async () => {
         await signOut()
@@ -48,10 +55,10 @@ export default function Navbar() {
                                 <img src="/escudo.jpg" alt="Falla Turia" className="w-full h-full object-cover" />
                             </div>
                             <div className="flex flex-col hidden sm:flex justify-center items-start h-12">
-                                <span className="text-white font-display font-bold text-base leading-none tracking-wide group-hover:text-primary transition-colors whitespace-nowrap">
+                                <span className="font-display font-black text-xl leading-none tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-primary to-primary-dark drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] filter transition-all whitespace-nowrap uppercase">
                                     Falla Turia
                                 </span>
-                                <span className="text-white font-display font-bold text-base leading-none tracking-wide group-hover:text-primary transition-colors whitespace-nowrap">
+                                <span className="font-display font-bold text-xs leading-none tracking-[0.15em] text-gray-300 group-hover:text-white transition-colors whitespace-nowrap uppercase mt-1">
                                     Plaça de l' Ajuntament
                                 </span>
                             </div>
@@ -59,27 +66,27 @@ export default function Navbar() {
                     </div>
 
                     <div className="hidden md:block">
-                        <div className="ml-10 flex items-baseline space-x-4">
-                            <Link to="/" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                        <div className="ml-10 flex items-baseline space-x-2">
+                            <Link to="/" className={navLinkClass('/')}>
                                 {t('nav.home')}
                             </Link>
-                            <Link to="/news" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            <Link to="/news" className={navLinkClass('/news')}>
                                 {t('nav.news')}
                             </Link>
-                            <Link to="/agenda" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            <Link to="/agenda" className={navLinkClass('/agenda')}>
                                 {t('nav.agenda')}
                             </Link>
-                            <Link to="/lottery" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            <Link to="/lottery" className={navLinkClass('/lottery')}>
                                 {t('nav.lottery')}
                             </Link>
-                            <Link to="/representatives" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            <Link to="/representatives" className={navLinkClass('/representatives')}>
                                 {t('nav.representatives')}
                             </Link>
-                            <Link to="/gallery" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            <Link to="/gallery" className={navLinkClass('/gallery')}>
                                 {t('nav.gallery')}
                             </Link>
-                            <Link to="/clothing" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                Ropa
+                            <Link to="/clothing" className={navLinkClass('/clothing')}>
+                                {t('nav.clothing')}
                             </Link>
 
                             {checkPermission(['subscriber', 'author', 'editor', 'admin']) && (
@@ -89,7 +96,7 @@ export default function Navbar() {
                             )}
 
                             {checkPermission(['admin', 'editor', 'author']) && (
-                                <Link to="/admin" className="bg-primary/10 text-primary hover:bg-primary/20 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2">
+                                <Link to="/admin" className="bg-primary/10 text-primary hover:bg-primary/20 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] flex items-center gap-2">
                                     <Shield size={16} />
                                     {t('nav.panel')}
                                 </Link>
@@ -151,7 +158,7 @@ export default function Navbar() {
                         ) : (
                             <Link
                                 to="/login"
-                                className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-full text-sm font-bold transition-transform transform hover:scale-105 shadow-lg shadow-primary/20"
+                                className="bg-gradient-to-r from-primary to-primary-dark text-white px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-primary/30 hover:shadow-[0_0_20px_rgba(239,68,68,0.5)]"
                             >
                                 {t('nav.access')}
                             </Link>

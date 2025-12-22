@@ -59,18 +59,18 @@ export default function Clothing() {
 
                     <button
                         onClick={() => setIsOpen(true)}
-                        className="flex items-center gap-3 bg-surface-dark border border-white/10 px-6 py-4 rounded-2xl hover:bg-white/5 transition-all group"
+                        className="flex items-center gap-3 bg-surface-dark border border-white/10 px-6 py-4 rounded-2xl hover:bg-white/5 transition-all duration-300 group hover:border-primary/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.2)] active:scale-95"
                     >
                         <div className="relative">
-                            <ShoppingBag className="w-6 h-6 text-white group-hover:text-primary transition-colors" />
+                            <ShoppingBag className="w-6 h-6 text-white group-hover:text-primary transition-colors duration-300" />
                             {cartItems.length > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-surface-dark">
+                                <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-surface-dark animate-pulse">
                                     {cartItems.length}
                                 </span>
                             )}
                         </div>
                         <div className="text-left">
-                            <div className="text-xs text-gray-400 uppercase font-bold">Tu Pedido</div>
+                            <div className="text-xs text-gray-400 uppercase font-bold group-hover:text-gray-300 transition-colors">Tu Pedido</div>
                             <div className="text-white font-bold">{cartItems.reduce((acc, i) => acc + (i.price * i.quantity), 0)}€</div>
                         </div>
                     </button>

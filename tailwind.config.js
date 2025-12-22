@@ -33,11 +33,17 @@ export default {
             animation: {
                 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                 'fire-flicker': 'flicker 2s infinite alternate',
+                'fire-text': 'fire-text 3s ease infinite',
             },
             keyframes: {
                 flicker: {
-                    '0%, 100%': { opacity: 1 },
-                    '50%': { opacity: 0.8 },
+                    '0%, 100%': { opacity: '1' },
+                    '50%': { opacity: '0.8' },
+                },
+                'fire-text': {
+                    '0%': { backgroundPosition: '0% 50%' },
+                    '50%': { backgroundPosition: '100% 50%' },
+                    '100%': { backgroundPosition: '0% 50%' },
                 }
             }
         },

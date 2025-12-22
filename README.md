@@ -16,10 +16,11 @@ Plataforma web moderna para la Falla Turia que permite a los miembros de la comi
 ### Para Usuarios
 - 🔥 **Diseño Temático**: Fondo animado de fuego con efectos visuales impresionantes
 - 🗞️ **Noticias**: Últimas novedades de la comisión
-- 📅 **Agenda**: Calendario completo de eventos de las Fallas 2025-2026
+- 📅 **Agenda**: Calendario dinámico con eventos destacados y sección de histórico
 - 🎫 **Lotería**: Información y participación en el sorteo de Navidad
 - 👥 **Representantes**: Galería de los representantes oficiales 2026
 - 🖼️ **Galería de Fotos**: Visualización de imágenes de la comisión
+- 📸 **Noticias Multi-foto**: Carrusel de imágenes en los artículos del blog
 - 💬 **Sugerencias**: Buzón para propuestas y sugerencias
 - 🌍 **Multiidioma**: Español y Valenciano
 - 👤 **Perfil de Usuario**: Visualización del nombre completo en el navbar

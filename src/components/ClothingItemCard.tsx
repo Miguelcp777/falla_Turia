@@ -100,9 +100,9 @@ export default function ClothingItemCard({ item }: { item: ClothingItem }) {
                     <button
                         onClick={handleAddToCart}
                         disabled={added}
-                        className={`w-full py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 ${added
+                        className={`w-full py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 active:scale-95 ${added
                             ? 'bg-green-500/20 text-green-400 border border-green-500/50'
-                            : 'bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/20 hover:shadow-primary/40'
+                            : 'bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/20 hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] hover:-translate-y-1'
                             }`}
                     >
                         {added ? (
