@@ -172,6 +172,19 @@ export default function Navbar() {
                             <button onClick={() => setLanguage('va')} className={`opacity-${language === 'va' ? '100' : '50'}`}><FlagVA /></button>
                         </div>
 
+                        {/* Mobile Cart */}
+                        <button
+                            onClick={() => setIsCartOpen(true)}
+                            className="text-gray-300 hover:text-primary relative"
+                        >
+                            <ShoppingBag size={24} />
+                            {items.length > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-background-dark">
+                                    {items.length}
+                                </span>
+                            )}
+                        </button>
+
                         <button
                             onClick={() => setIsOpen(!isOpen)}
                             className="text-gray-400 hover:text-white p-2"
@@ -186,27 +199,27 @@ export default function Navbar() {
             {isOpen && (
                 <div className="md:hidden bg-background-dark border-t border-surface-dark">
                     <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                        <Link to="/" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.home')}</Link>
-                        <Link to="/news" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.news')}</Link>
-                        <Link to="/agenda" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.agenda')}</Link>
-                        <Link to="/lottery" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.lottery')}</Link>
-                        <Link to="/representatives" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.representatives')}</Link>
-                        <Link to="/gallery" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.gallery')}</Link>
-                        <Link to="/clothing" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Ropa</Link>
+                        <Link to="/" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.home')}</Link>
+                        <Link to="/news" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.news')}</Link>
+                        <Link to="/agenda" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.agenda')}</Link>
+                        <Link to="/lottery" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.lottery')}</Link>
+                        <Link to="/representatives" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.representatives')}</Link>
+                        <Link to="/gallery" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.gallery')}</Link>
+                        <Link to="/clothing" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.clothing')}</Link>
                         {checkPermission(['subscriber', 'author', 'editor', 'admin']) && (
-                            <Link to="/suggestions" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.suggestions_full')}</Link>
+                            <Link to="/suggestions" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.suggestions_full')}</Link>
                         )}
                         {checkPermission(['admin', 'editor', 'author']) && (
-                            <Link to="/admin" className="text-primary hover:text-red-400 block px-3 py-2 rounded-md text-base font-medium font-bold">{t('nav.panel')}</Link>
+                            <Link to="/admin" onClick={() => setIsOpen(false)} className="text-primary hover:text-red-400 block px-3 py-2 rounded-md text-base font-medium font-bold">{t('nav.panel')}</Link>
                         )}
 
                         <div className="border-t border-gray-700 mt-4 pt-4">
                             {user ? (
-                                <button onClick={handleSignOut} className="text-gray-300 hover:text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium">
+                                <button onClick={() => { handleSignOut(); setIsOpen(false); }} className="text-gray-300 hover:text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium">
                                     {t('nav.logout')}
                                 </button>
                             ) : (
-                                <Link to="/login" className="text-primary hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+                                <Link to="/login" onClick={() => setIsOpen(false)} className="text-primary hover:text-white block px-3 py-2 rounded-md text-base font-medium">
                                     {t('nav.login')}
                                 </Link>
                             )}

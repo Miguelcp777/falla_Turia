@@ -30,7 +30,7 @@ export default function Home() {
                 </div>
 
                 <div className="relative mb-12 group">
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-orange-500 to-red-600 bg-[length:200%_auto] tracking-tighter leading-tight drop-shadow-[0_0_30px_rgba(239,68,68,0.6)] relative z-10 animate-fire-text">
+                    <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-orange-500 to-red-600 bg-[length:200%_auto] tracking-tighter leading-tight drop-shadow-[0_0_30px_rgba(239,68,68,0.6)] relative z-10 animate-fire-text">
                         {t('home.title')}
                     </h1>
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-orange-500/20 via-red-500/20 to-primary/20 blur-3xl opacity-50 animate-pulse-slow -z-10 rounded-full"></div>
