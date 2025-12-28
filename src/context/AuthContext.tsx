@@ -118,6 +118,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.error('Failed to notify admin:', err)
             // Don't block sign up success
         }
+
+        // Trigger n8n webhook
+        try {
+            // Using Netlify proxy to bypass CORS
+            await fetch('/api/webhook-register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email,
+                    ...metadata,
+                    created_at: new Date().toISOString()
+                })
+            })
+        } catch (err) {
+            console.error('Failed to trigger n8n webhook:', err)
+        }
     }
 
     return (

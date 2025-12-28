@@ -14,6 +14,7 @@ import Gallery from '@/pages/Gallery'
 import Dashboard from '@/pages/Dashboard'
 import ResetPassword from '@/pages/ResetPassword'
 import Clothing from '@/pages/Clothing'
+import Institution from '@/pages/Institution'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import FireBackground from '@/components/layout/FireBackground'
 
@@ -43,6 +44,7 @@ function App() {
                                 {/* Public Routes */}
                                 <Route path="/" element={<Home />} />
                                 <Route path="/login" element={<Login />} />
+                                <Route path="/institution" element={<Institution />} />
                                 <Route path="/reset-password" element={<ResetPassword />} />
                                 <Route path="/news" element={<News />} />
                                 <Route path="/agenda" element={<Agenda />} />

@@ -10,11 +10,11 @@ function NewsCarousel({ images, title }: { images: string[], title: string }) {
     const prev = () => setCurrentIndex((prev) => (prev - 1 + images.length) % images.length)
 
     return (
-        <div className="relative w-full h-full group">
+        <div className="relative w-full group flex justify-center bg-black/5 dark:bg-white/5">
             <img
                 src={images[currentIndex]}
                 alt={`${title} - ${currentIndex + 1}`}
-                className="w-full h-full object-cover transition-opacity duration-300"
+                className="w-full max-h-[60vh] object-contain transition-opacity duration-300"
             />
             {images.length > 1 && (
                 <>
@@ -187,17 +187,17 @@ export default function News() {
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
                         </button>
 
-                        <div className="relative h-64 md:h-96 w-full bg-gray-200 dark:bg-gray-800">
+                        <div className="relative w-full bg-gray-200 dark:bg-gray-800 flex justify-center items-center">
                             {selectedNews.images && selectedNews.images.length > 0 ? (
                                 <NewsCarousel images={selectedNews.images} title={selectedNews.title} />
                             ) : selectedNews.image_url ? (
                                 <img
                                     src={selectedNews.image_url}
                                     alt={selectedNews.title}
-                                    className="w-full h-full object-cover"
+                                    className="w-full max-h-[60vh] object-contain"
                                 />
                             ) : (
-                                <div className="flex items-center justify-center h-full">
+                                <div className="flex items-center justify-center h-64 md:h-96">
                                     <Flame className="w-20 h-20 text-gray-300 dark:text-gray-600" />
                                 </div>
                             )}
@@ -208,7 +208,7 @@ export default function News() {
                                         <Clock size={16} />
                                         <span>{new Date(selectedNews.published_at).toLocaleDateString()}</span>
                                     </div>
-                                    <h2 className="text-2xl md:text-3xl font-bold text-white">
+                                    <h2 className="text-2xl md:text-3xl font-bold text-white drop-shadow-md">
                                         {selectedNews.title}
                                     </h2>
                                 </div>

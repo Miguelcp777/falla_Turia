@@ -41,6 +41,11 @@ export default function Dashboard() {
 
     // Representatives Form
     const [repsList, setRepsList] = useState<any[]>([])
+    const [editingRepId, setEditingRepId] = useState<string | null>(null)
+    const [repForm, setRepForm] = useState<{ name: string, role: string, description: string, image_url: string, year: string, display_order: number }>({
+        name: '', role: 'vocal', description: '', image_url: '', year: '2025', display_order: 0
+    })
+    const [repImageFile, setRepImageFile] = useState<File | null>(null)
 
     // Gallery Management
     const [galleryList, setGalleryList] = useState<any[]>([])
@@ -106,15 +111,11 @@ export default function Dashboard() {
         const { data } = await supabase
             .from('representatives')
             .select('*')
-            // fixed order for display
+            .order('display_order', { ascending: true })
             .order('role', { ascending: true })
 
         if (data) {
-            // Sort manually to custom order if needed, otherwise rely on query
-            // Custom sort: FM, FMI, Presi, PresiInf
-            const order = ['fallera_mayor', 'fallera_mayor_infantil', 'presidente', 'presidente_infantil']
-            const sorted = data.sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role))
-            setRepsList(sorted)
+            setRepsList(data)
         }
     }
 
@@ -512,34 +513,75 @@ export default function Dashboard() {
         }
     }
 
-    const handleUpdateRepresentative = async (e: React.FormEvent, repId: string, name: string, description: string, imageFile: File | null, currentImageUrl: string) => {
+    const handleCreateOrUpdateRepresentative = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
         try {
-            let finalImageUrl = currentImageUrl
+            let finalImageUrl = repForm.image_url
 
-            if (imageFile) {
-                finalImageUrl = await handleImageUpload(imageFile)
+            if (repImageFile) {
+                finalImageUrl = await handleImageUpload(repImageFile)
             }
 
-            const { error } = await supabase
-                .from('representatives')
-                .update({
-                    name,
-                    description,
-                    image_url: finalImageUrl,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', repId)
+            const repData = {
+                name: repForm.name,
+                role: repForm.role,
+                description: repForm.description,
+                image_url: finalImageUrl,
+                year: repForm.year,
+                display_order: repForm.display_order,
+                updated_at: new Date().toISOString()
+            }
 
-            if (error) throw error
-            alert(t('dashboard.representatives.update_success'))
+            if (editingRepId) {
+                const { error } = await supabase
+                    .from('representatives')
+                    .update(repData)
+                    .eq('id', editingRepId)
+                if (error) throw error
+                alert('Representante actualizado')
+            } else {
+                const { error } = await supabase
+                    .from('representatives')
+                    .insert(repData)
+                if (error) throw error
+                // alert('Representante creado')
+                alert("Representante creado")
+            }
+
+            setRepForm({ name: '', role: 'vocal', description: '', image_url: '', year: '2025', display_order: 0 })
+            setRepImageFile(null)
+            setEditingRepId(null)
             fetchRepresentatives()
         } catch (error: any) {
             console.error('Error updating representative:', error)
-            alert(t('dashboard.common.error') + (error as Error).message)
+            alert('Error: ' + (error as Error).message)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const startEditRep = (rep: any) => {
+        setEditingRepId(rep.id)
+        setRepForm({
+            name: rep.name || '',
+            role: rep.role,
+            description: rep.description || '',
+            image_url: rep.image_url || '',
+            year: rep.year || '2025',
+            display_order: rep.display_order || 0
+        })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    const handleDeleteRep = async (id: string) => {
+        if (!confirm('¿Eliminar este representante?')) return
+        try {
+            const { error } = await supabase.from('representatives').delete().eq('id', id)
+            if (error) throw error
+            fetchRepresentatives()
+        } catch (error: any) {
+            alert('Error: ' + error.message)
         }
     }
 
@@ -770,7 +812,7 @@ export default function Dashboard() {
                                 }`}
                         >
                             <Crown size={20} />
-                            {t('dashboard.tabs.representatives')}
+                            {t('nav.institution')}
                         </button>
                     )}
                     <button
@@ -1298,19 +1340,143 @@ export default function Dashboard() {
                     )}
 
                     {activeTab === 'representatives' && (role === 'admin' || role === 'editor') && (
-                        <div className="space-y-12">
-                            {/* Gallery logic already translated in previous step but checking context */}
-                            <h2 className="text-2xl font-bold text-white mb-6">{t('dashboard.representatives.title')}</h2>
+                        <div className="space-y-10">
+                            {/* Form */}
+                            <form onSubmit={handleCreateOrUpdateRepresentative} className="space-y-6 max-w-2xl bg-white/5 p-6 rounded-2xl border border-white/5">
+                                <h3 className="text-xl font-bold text-white mb-4">
+                                    {editingRepId ? 'Editar Representante' : 'Añadir Representante'}
+                                </h3>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="col-span-2">
+                                        <label className="block text-gray-400 text-sm font-bold mb-2">Nombre</label>
+                                        <input
+                                            type="text"
+                                            value={repForm.name}
+                                            onChange={e => setRepForm({ ...repForm, name: e.target.value })}
+                                            className="w-full bg-background-dark border border-white/10 rounded-lg px-4 py-2 text-white"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-400 text-sm font-bold mb-2">Rol (Clave interna)</label>
+                                        <select
+                                            value={repForm.role}
+                                            onChange={e => setRepForm({ ...repForm, role: e.target.value })}
+                                            className="w-full bg-background-dark border border-white/10 rounded-lg px-4 py-2 text-white"
+                                        >
+                                            <option value="fallera_mayor">Fallera Mayor</option>
+                                            <option value="fallera_mayor_infantil">Fallera Mayor Infantil</option>
+                                            <option value="presidente">Presidente</option>
+                                            <option value="presidente_infantil">Presidente Infantil</option>
+                                            <option value="vicepresidente">Vicepresidente</option>
+                                            <option value="secretario">Secretario/a</option>
+                                            <option value="tesorero">Tesorero/a</option>
+                                            <option value="delegado">Delegado/a</option>
+                                            <option value="vocal">Vocal</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-400 text-sm font-bold mb-2">Año (Ejercicio)</label>
+                                        <input
+                                            type="text"
+                                            value={repForm.year}
+                                            onChange={e => setRepForm({ ...repForm, year: e.target.value })}
+                                            className="w-full bg-background-dark border border-white/10 rounded-lg px-4 py-2 text-white"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-400 text-sm font-bold mb-2">Orden Visual</label>
+                                        <input
+                                            type="number"
+                                            value={repForm.display_order}
+                                            onChange={e => setRepForm({ ...repForm, display_order: parseInt(e.target.value) || 0 })}
+                                            className="w-full bg-background-dark border border-white/10 rounded-lg px-4 py-2 text-white"
+                                        />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <label className="block text-gray-400 text-sm font-bold mb-2">Descripción / Saluda</label>
+                                        <textarea
+                                            value={repForm.description}
+                                            onChange={e => setRepForm({ ...repForm, description: e.target.value })}
+                                            className="w-full bg-background-dark border border-white/10 rounded-lg px-4 py-2 text-white h-24"
+                                            placeholder="Texto del saluda o descripción..."
+                                        />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <label className="block text-gray-400 text-sm font-bold mb-2">Imagen</label>
+                                        <input
+                                            type="file"
+                                            onChange={e => setRepImageFile(e.target.files?.[0] || null)}
+                                            className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark"
+                                        />
+                                        {repForm.image_url && !repImageFile && (
+                                            <p className="text-xs text-gray-500 mt-1">Imagen actual: {repForm.image_url}</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex gap-4">
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-6 rounded-xl transition-colors disabled:opacity-50"
+                                    >
+                                        {loading ? 'Guardando...' : (editingRepId ? 'Actualizar' : 'Crear Nuevo')}
+                                    </button>
+                                    {editingRepId && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setEditingRepId(null)
+                                                setRepForm({ name: '', role: 'vocal', description: '', image_url: '', year: '2025', display_order: 0 })
+                                                setRepImageFile(null)
+                                            }}
+                                            className="text-gray-400 hover:text-white font-bold py-2 px-4"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    )}
+                                </div>
+                            </form>
+
+                            {/* List */}
+                            <div className="grid grid-cols-1 gap-4">
                                 {repsList.map((rep) => (
-                                    <RepresentativeCard
-                                        key={rep.id}
-                                        rep={rep}
-                                        onUpdate={handleUpdateRepresentative}
-                                        loading={loading}
-                                        t={t}
-                                    />
+                                    <div key={rep.id} className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-center justify-between group hover:border-primary/50 transition-colors">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-16 h-16 rounded-full overflow-hidden bg-black/20 flex-shrink-0">
+                                                {rep.image_url ? (
+                                                    <img src={rep.image_url} alt={rep.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center"><Crown size={20} className="opacity-20" /></div>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <h4 className="text-white font-bold">{rep.name}</h4>
+                                                <div className="flex flex-wrap gap-2 text-xs mt-1">
+                                                    <span className="bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase">{rep.role}</span>
+                                                    <span className="bg-white/10 text-gray-300 px-2 py-0.5 rounded-full">{rep.year}</span>
+                                                    <span className="text-gray-500">Orden: {rep.display_order}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => startEditRep(rep)}
+                                                className="p-2 hover:bg-blue-500/20 text-blue-500 rounded-lg transition-colors"
+                                                title="Editar"
+                                            >
+                                                <Edit size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteRep(rep.id)}
+                                                className="p-2 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors"
+                                                title="Eliminar"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         </div>
@@ -1655,103 +1821,4 @@ export default function Dashboard() {
     )
 }
 
-function RepresentativeCard({ rep, onUpdate, loading, t }: { rep: any, onUpdate: any, loading: boolean, t: any }) {
-    const [name, setName] = useState(rep.name || '')
-    const [desc, setDesc] = useState(rep.description || '')
-    const [imageFile, setImageFile] = useState<File | null>(null)
-    const [previewUrl, setPreviewUrl] = useState(rep.image_url || '')
 
-    // Reset local state when rep changes (though key usually handles this)
-    useEffect(() => {
-        setName(rep.name || '')
-        setDesc(rep.description || '')
-        setPreviewUrl(rep.image_url || '')
-    }, [rep])
-
-    const getRoleName = (role: string) => {
-        switch (role) {
-            case 'fallera_mayor': return t('representatives.roles.fallera_mayor')
-            case 'fallera_mayor_infantil': return t('representatives.roles.fallera_mayor_infantil')
-            case 'presidente': return t('representatives.roles.presidente')
-            case 'presidente_infantil': return t('representatives.roles.presidente_infantil')
-            default: return role
-        }
-    }
-
-    const handleSubmit = (e: FormEvent) => {
-        onUpdate(e, rep.id, name, desc, imageFile, previewUrl)
-    }
-
-    return (
-        <form onSubmit={handleSubmit} className="bg-background-dark/50 border border-white/10 rounded-2xl p-6">
-            <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
-                <Crown size={20} />
-                {getRoleName(rep.role)}
-            </h3>
-
-            <div className="space-y-4">
-                {/* Image Upload Area */}
-                <div className="flex gap-4">
-                    <div className={`relative w - 24 h - 24 rounded - xl overflow - hidden bg - white / 5 border border - white / 10 flex - shrink - 0 group`}>
-                        {previewUrl ? (
-                            <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-500">
-                                <Users size={24} />
-                            </div>
-                        )}
-                        <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
-                            <Upload size={20} className="text-white" />
-                            <input
-                                type="file"
-                                className="hidden"
-                                accept="image/*"
-                                onChange={(e) => {
-                                    if (e.target.files?.[0]) {
-                                        setImageFile(e.target.files[0])
-                                        setPreviewUrl(URL.createObjectURL(e.target.files[0]))
-                                    }
-                                }}
-                            />
-                        </label>
-                    </div>
-
-                    <div className="flex-1 space-y-3">
-                        <div>
-                            <label className="block text-xs font-medium text-gray-400 mb-1">{t('dashboard.representatives.label_name', 'Nombre Completo')}</label>
-                            <input
-                                type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="w-full bg-black/50 border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:border-primary focus:outline-none"
-                                placeholder="Nombre..."
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-1">Descripción / Saluda</label>
-                    <textarea
-                        rows={3}
-                        value={desc}
-                        onChange={(e) => setDesc(e.target.value)}
-                        className="w-full bg-black/50 border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:border-primary focus:outline-none"
-                        placeholder="Escribe unas palabras..."
-                    />
-                </div>
-
-                <div className="flex justify-end pt-2">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="flex items-center gap-2 bg-primary/20 hover:bg-primary/30 text-primary font-bold px-4 py-2 rounded-lg transition-all text-sm disabled:opacity-50"
-                    >
-                        <Save size={16} />
-                        {t('dashboard.representatives.submit_update', 'Guardar')}
-                    </button>
-                </div>
-            </div>
-        </form>
-    )
-}

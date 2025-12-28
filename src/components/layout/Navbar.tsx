@@ -70,6 +70,9 @@ export default function Navbar() {
                             <Link to="/" className={navLinkClass('/')}>
                                 {t('nav.home')}
                             </Link>
+                            <Link to="/institution" className={navLinkClass('/institution')}>
+                                {t('nav.institution')}
+                            </Link>
                             <Link to="/news" className={navLinkClass('/news')}>
                                 {t('nav.news')}
                             </Link>
@@ -200,6 +203,7 @@ export default function Navbar() {
                 <div className="md:hidden bg-background-dark border-t border-surface-dark">
                     <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                         <Link to="/" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.home')}</Link>
+                        <Link to="/institution" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.institution')}</Link>
                         <Link to="/news" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.news')}</Link>
                         <Link to="/agenda" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.agenda')}</Link>
                         <Link to="/lottery" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.lottery')}</Link>

@@ -8,6 +8,7 @@ export const translations = {
     es: {
         nav: {
             home: 'Inicio',
+            institution: 'Institución',
             news: 'Noticias',
             agenda: 'Agenda',
             lottery: 'Lotería',
@@ -238,6 +239,7 @@ export const translations = {
     va: {
         nav: {
             home: 'Inici',
+            institution: 'Institució',
             news: 'Notícies',
             agenda: 'Agenda',
             lottery: 'Loteria',
