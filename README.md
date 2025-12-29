@@ -38,6 +38,8 @@ Plataforma web moderna para la Falla Turia que permite a los miembros de la comi
 - 📸 **Galería Administrativa**: Subida múltiple de imágenes
 - 🔐 **Sistema RBAC**: Control de acceso basado en roles
 - 🗑️ **Eliminación Completa**: Borrado total de usuarios incluyendo cuenta de autenticación
+- 📨 **Integración Webhook**: Sincronización automática de nuevos usuarios con n8n
+- 🏢 **Panel Institución**: Gestión de los textos e imágenes de la sección Institución
 
 ## 🛠️ Tecnologías
 
@@ -252,6 +254,7 @@ falla-turia/
 2. Build command: `npm run build`
 3. Publish directory: `dist`
 4. Configura las variables de entorno
+5. **Importante**: El proyecto incluye un archivo `_redirects` en `public/` para manejar el proxy del webhook y el routing SPA. Asegúrate de que se copie al directodio `dist` durante el build (Vite lo hace automáticamente).
 
 ## 🤝 Contribuir
 
