@@ -135,7 +135,8 @@ export const translations = {
                 gallery: 'Galería',
                 users: 'Usuarios',
                 representatives: 'Representantes',
-                clothing: 'Ropa'
+                clothing: 'Ropa',
+                settings: 'Configuración'
             },
             news: {
                 title_new: 'Nueva Noticia',
@@ -233,6 +234,16 @@ export const translations = {
                 error: 'Error',
                 image_replace: 'Subir nueva imagen (reemplaza la actual)',
                 file_selected: 'Archivo seleccionado'
+            },
+            settings: {
+                title: 'Configuración General',
+                year_label: 'Año en curso (Falles)',
+                planta_date_label: 'Fecha de La Plantà',
+                planta_date_help: 'Esta fecha se usa para la cuenta atrás en la página de inicio.',
+                save: 'Guardar Configuración',
+                saving: 'Guardando...',
+                success: '¡Configuración actualizada!',
+                error: 'Error actualizando configuración'
             }
         }
     },
@@ -366,7 +377,8 @@ export const translations = {
                 gallery: 'Galeria',
                 users: 'Usuaris',
                 representatives: 'Representants',
-                clothing: 'Indumentària'
+                clothing: 'Indumentària',
+                settings: 'Configuració'
             },
             news: {
                 title_new: 'Nova Notícia',
@@ -464,6 +476,16 @@ export const translations = {
                 error: 'Error',
                 image_replace: 'Pujar nova imatge (reemplaça l\'actual)',
                 file_selected: 'Arxiu seleccionat'
+            },
+            settings: {
+                title: 'Configuració General',
+                year_label: 'Any en curs (Falles)',
+                planta_date_label: 'Data de La Plantà',
+                planta_date_help: 'Aquesta data s\'utilitza per al compte enrere a la pàgina d\'inici.',
+                save: 'Guardar Configuració',
+                saving: 'Guardant...',
+                success: 'Configuració actualitzada!',
+                error: 'Error actualitzant configuració'
             }
         }
     }

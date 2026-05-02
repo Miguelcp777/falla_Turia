@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '@/context/AuthContext'
 import { LanguageProvider } from '@/context/LanguageContext'
 import { CartProvider } from '@/context/CartContext'
+import { SiteConfigProvider } from '@/context/SiteConfigContext'
 import Navbar from '@/components/layout/Navbar'
 import Home from '@/pages/Home'
 import Login from '@/pages/Login'
@@ -21,6 +22,7 @@ import FireBackground from '@/components/layout/FireBackground'
 function App() {
     return (
         <AuthProvider>
+            <SiteConfigProvider>
             <LanguageProvider>
                 <CartProvider>
                     <BrowserRouter>
@@ -67,6 +69,7 @@ function App() {
                     </BrowserRouter>
                 </CartProvider>
             </LanguageProvider>
+            </SiteConfigProvider>
         </AuthProvider>
     )
 }

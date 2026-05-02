@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSiteConfig } from '@/context/SiteConfigContext'
 
 interface TimeLeft {
     days: number
@@ -10,10 +11,13 @@ interface TimeLeft {
 
 const Countdown = () => {
     const { t } = useLanguage()
+    const { plantaDate } = useSiteConfig()
     const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 
     useEffect(() => {
-        const targetDate = new Date('2026-03-15T00:00:00')
+        if (!plantaDate) return
+
+        const targetDate = new Date(plantaDate)
 
         const calculateTimeLeft = () => {
             const difference = +targetDate - +new Date()
@@ -25,6 +29,8 @@ const Countdown = () => {
                     minutes: Math.floor((difference / 1000 / 60) % 60),
                     seconds: Math.floor((difference / 1000) % 60)
                 })
+            } else {
+                setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
             }
         }
 
@@ -32,7 +38,7 @@ const Countdown = () => {
         const timer = setInterval(calculateTimeLeft, 1000)
 
         return () => clearInterval(timer)
-    }, [])
+    }, [plantaDate])
 
     const TimeUnit = ({ value, label }: { value: number, label: string }) => (
         <div className="flex flex-col items-center p-3 bg-background-dark/80 backdrop-blur-sm border border-white/10 rounded-xl min-w-[80px] sm:min-w-[100px]">
@@ -61,3 +67,4 @@ const Countdown = () => {
 }
 
 export default Countdown
+

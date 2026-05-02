@@ -1,14 +1,21 @@
 import { useState, useEffect, Fragment, FormEvent } from 'react'
 import { supabase, Profile, UserRole } from '@/lib/supabase'
-import { Flame, Calendar, Newspaper, Plus, Upload, Clover, Save, Users, Shield, CheckCircle, XCircle, Trash2, Edit2 as Edit, X, Crown, Image as ImageIcon, ShoppingBag, AlertCircle, MapPin, Loader2, RefreshCw } from 'lucide-react'
+import { Flame, Calendar, Newspaper, Plus, Upload, Clover, Save, Users, Shield, CheckCircle, XCircle, Trash2, Edit2 as Edit, X, Crown, Image as ImageIcon, ShoppingBag, AlertCircle, MapPin, Loader2, RefreshCw, Settings } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSiteConfig } from '@/context/SiteConfigContext'
 
-type Tab = 'news' | 'agenda' | 'lottery' | 'users' | 'representatives' | 'gallery' | 'clothing'
+type Tab = 'news' | 'agenda' | 'lottery' | 'users' | 'representatives' | 'gallery' | 'clothing' | 'settings'
 
 export default function Dashboard() {
     const { role } = useAuth()
     const { t } = useLanguage()
+    const { currentYear, plantaDate, updateSiteConfig } = useSiteConfig()
+
+    // Settings Form
+    const [settingsYear, setSettingsYear] = useState<number>(currentYear)
+    const [settingsPlantaDate, setSettingsPlantaDate] = useState('')
+    const [settingsLoading, setSettingsLoading] = useState(false)
     const [activeTab, setActiveTab] = useState<Tab>('news')
     const [loading, setLoading] = useState(false)
 
@@ -88,6 +95,15 @@ export default function Dashboard() {
         } else if (activeTab === 'clothing') {
             fetchClothingItems()
             fetchOrders()
+        } else if (activeTab === 'settings') {
+            // Initialize settings form with current values from context
+            setSettingsYear(currentYear)
+            if (plantaDate) {
+                // Convert ISO date to datetime-local format (YYYY-MM-DDTHH:MM)
+                const d = new Date(plantaDate)
+                const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+                setSettingsPlantaDate(local.toISOString().slice(0, 16))
+            }
         }
     }, [activeTab, role])
 
@@ -825,6 +841,18 @@ export default function Dashboard() {
                         <ShoppingBag size={20} />
                         {t('dashboard.tabs.clothing')}
                     </button>
+                    {role === 'admin' && (
+                        <button
+                            onClick={() => setActiveTab('settings')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'settings'
+                                ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
+                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                }`}
+                        >
+                            <Settings size={20} />
+                            {t('dashboard.tabs.settings')}
+                        </button>
+                    )}
                 </div>
 
                 <div className="bg-surface-dark border border-white/5 rounded-3xl p-8 shadow-xl">
@@ -1813,6 +1841,80 @@ export default function Dashboard() {
                                     )}
                                 </div>
                             )}
+                        </div>
+                    )}
+                    {activeTab === 'settings' && role === 'admin' && (
+                        <div>
+                            <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+                                <Settings className="text-primary" size={28} />
+                                {t('dashboard.settings.title')}
+                            </h2>
+
+                            <form
+                                onSubmit={async (e) => {
+                                    e.preventDefault()
+                                    setSettingsLoading(true)
+                                    try {
+                                        await updateSiteConfig(settingsYear, settingsPlantaDate)
+                                        alert(t('dashboard.settings.success'))
+                                    } catch (err: any) {
+                                        alert(t('dashboard.settings.error') + ': ' + err.message)
+                                    } finally {
+                                        setSettingsLoading(false)
+                                    }
+                                }}
+                                className="space-y-8 max-w-xl"
+                            >
+                                {/* Year Field */}
+                                <div>
+                                    <label className="block text-gray-400 mb-2 font-medium">{t('dashboard.settings.year_label')}</label>
+                                    <input
+                                        type="number"
+                                        value={settingsYear}
+                                        onChange={(e) => setSettingsYear(parseInt(e.target.value) || new Date().getFullYear())}
+                                        min={2020}
+                                        max={2100}
+                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white text-lg font-bold focus:outline-none focus:border-red-500 transition-colors"
+                                    />
+                                    <p className="text-gray-500 text-sm mt-2">Este valor se muestra en el badge "Falles {settingsYear}" y en la sección de representantes.</p>
+                                </div>
+
+                                {/* Plantà Date Field */}
+                                <div>
+                                    <label className="block text-gray-400 mb-2 font-medium">{t('dashboard.settings.planta_date_label')}</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={settingsPlantaDate}
+                                        onChange={(e) => setSettingsPlantaDate(e.target.value)}
+                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                                    />
+                                    <p className="text-gray-500 text-sm mt-2">{t('dashboard.settings.planta_date_help')}</p>
+                                </div>
+
+                                {/* Preview */}
+                                <div className="bg-black/30 border border-white/5 rounded-xl p-6">
+                                    <p className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-3">Vista previa</p>
+                                    <div className="flex items-center gap-4">
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+                                            <span className="text-sm font-bold text-red-200 tracking-wide uppercase">Falles {settingsYear}</span>
+                                        </div>
+                                        {settingsPlantaDate && (
+                                            <span className="text-gray-300 text-sm">
+                                                Plantà: {new Date(settingsPlantaDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={settingsLoading}
+                                    className="flex items-center gap-2 bg-gradient-to-r from-primary to-red-700 text-white font-bold px-8 py-3 rounded-xl hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <Save size={20} />
+                                    {settingsLoading ? t('dashboard.settings.saving') : t('dashboard.settings.save')}
+                                </button>
+                            </form>
                         </div>
                     )}
                 </div>

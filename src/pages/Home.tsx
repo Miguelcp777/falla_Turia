@@ -2,11 +2,13 @@
 import { Link } from 'react-router-dom'
 import { Calendar as CalendarIcon, Newspaper, ArrowRight, Flame, Crown, Mail, Facebook, Instagram } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSiteConfig } from '@/context/SiteConfigContext'
 import Countdown from '@/components/ui/Countdown'
 import NextEventBanner from '@/components/ui/NextEventBanner'
 
 export default function Home() {
     const { t } = useLanguage()
+    const { currentYear } = useSiteConfig()
 
     return (
         <div className="min-h-[calc(100vh-80px)] relative overflow-hidden">
@@ -26,7 +28,7 @@ export default function Home() {
             <div className="relative z-10 container mx-auto px-6 pt-20 pb-20 text-center">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 backdrop-blur-sm border border-primary/20 mb-8 animate-fire-flicker">
                     <img src="/escudo.jpg" alt="Escudo" className="w-5 h-5 object-contain rounded-full" />
-                    <span className="text-sm font-bold text-red-200 tracking-wide uppercase">Falles 2026</span>
+                    <span className="text-sm font-bold text-red-200 tracking-wide uppercase">Falles {currentYear}</span>
                 </div>
 
                 <div className="relative mb-12 group">
@@ -58,7 +60,7 @@ export default function Home() {
                                 <span>{t('representatives.honor_roll')}</span>
                             </div>
                             <h2 className="text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-100 to-gray-300 mb-6 leading-tight drop-shadow-lg">
-                                {t('representatives.title')} <span className="text-secondary drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">2026</span>
+                                {t('representatives.title')} <span className="text-secondary drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">{currentYear}</span>
                             </h2>
                             <p className="text-gray-300 mb-8 text-lg font-light leading-relaxed">
                                 {t('representatives.home_subtitle')}
@@ -75,7 +77,7 @@ export default function Home() {
                             <div className="aspect-[4/3] rounded-2xl overflow-hidden border-4 border-white/10 shadow-2xl relative group-hover:border-secondary/30 transition-colors">
                                 <img
                                     src="/representantes_group.jpg"
-                                    alt="Representantes 2026"
+                                    alt={`Representantes ${currentYear}`}
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
