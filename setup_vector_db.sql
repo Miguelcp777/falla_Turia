@@ -72,6 +72,31 @@ CREATE POLICY "Admins can delete documents" ON public.documents
         )
     );
 
+-- Permisos de lectura de trozos para usuarios autenticados (necesario para el Chatbot)
+CREATE POLICY "Chunks are viewable by authenticated users" ON public.document_chunks
+    FOR SELECT TO authenticated USING (true);
+
+-- Permisos de gestión para admins
+CREATE POLICY "Admins can insert chunks" ON public.document_chunks
+    FOR INSERT TO authenticated WITH CHECK (
+        (auth.jwt() ->> 'email') = 'fallaturia@gmail.com' OR
+        EXISTS (
+            SELECT 1 FROM role_permissions rp
+            JOIN profiles p ON p.role = rp.role
+            WHERE p.id = auth.uid() AND rp.can_manage_actas = true
+        )
+    );
+
+CREATE POLICY "Admins can delete chunks" ON public.document_chunks
+    FOR DELETE TO authenticated USING (
+        (auth.jwt() ->> 'email') = 'fallaturia@gmail.com' OR
+        EXISTS (
+            SELECT 1 FROM role_permissions rp
+            JOIN profiles p ON p.role = rp.role
+            WHERE p.id = auth.uid() AND rp.can_manage_actas = true
+        )
+    );
+
 -- Nota Importante para Storage:
 -- 1. Ve a "Storage" en Supabase.
 -- 2. Crea un nuevo bucket llamado "actas".

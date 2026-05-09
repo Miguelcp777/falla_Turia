@@ -65,11 +65,18 @@ export const handler: Handler = async (event) => {
         const queryEmbedding = embeddingResponse.data[0].embedding;
 
         // 2. Search for relevant document chunks in the vector DB
-        const { data: matchedChunks } = await supabase.rpc('match_documents', {
+        console.log(`Searching for context for message: "${message}"`);
+        const { data: matchedChunks, error: rpcError } = await supabase.rpc('match_documents', {
             query_embedding: queryEmbedding,
-            match_threshold: 0.4,
+            match_threshold: 0.3, // Lowered for more flexibility
             match_count: 5
         });
+
+        if (rpcError) {
+            console.error('RPC Error:', rpcError);
+        }
+
+        console.log(`Found ${matchedChunks?.length || 0} matching chunks`);
 
         let contextText = '';
         if (matchedChunks && matchedChunks.length > 0) {
