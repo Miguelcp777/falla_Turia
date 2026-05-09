@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { X, Send, Loader2, MessageCircle } from 'lucide-react'
+import { X, Send, Loader2 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 
 interface Message {
