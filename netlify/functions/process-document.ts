@@ -1,7 +1,7 @@
 import { Handler } from '@netlify/functions';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
-import { PDFParse } from 'pdf-parse';
+import pdfParse from 'pdf-parse';
 
 export const handler: Handler = async (event, context) => {
     // CORS headers for preflight requests
@@ -58,8 +58,7 @@ export const handler: Handler = async (event, context) => {
 
         // 2. Extract text using pdf-parse
         console.log("Extracting text...");
-        const parser = new PDFParse({ data: buffer });
-        const pdfData = await parser.getText();
+        const pdfData = await pdfParse(buffer);
         const text = pdfData.text;
 
         if (!text || text.trim() === '') {
