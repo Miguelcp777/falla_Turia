@@ -2,13 +2,25 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { supabase, Profile, UserRole } from '../lib/supabase'
 
+export type RolePermissions = {
+    can_manage_agenda: boolean
+    can_manage_gallery: boolean
+    can_manage_news: boolean
+    can_manage_clothing: boolean
+    can_manage_lottery: boolean
+    can_manage_actas: boolean
+    can_manage_roles: boolean
+}
+
 type AuthContextType = {
     session: Session | null
     user: User | null
     profile: Profile | null
     role: UserRole | null
+    permissions: RolePermissions | null
     loading: boolean
     checkPermission: (allowedRoles: UserRole[]) => boolean
+    hasPermission: (permission: keyof RolePermissions) => boolean
     signOut: () => Promise<void>
     signIn: (email: string, password: string) => Promise<void>
     signUp: (email: string, password: string, metadata?: {
@@ -25,6 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [session, setSession] = useState<Session | null>(null)
     const [user, setUser] = useState<User | null>(null)
     const [profile, setProfile] = useState<Profile | null>(null)
+    const [permissions, setPermissions] = useState<RolePermissions | null>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -32,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setSession(session)
             setUser(session?.user ?? null)
             if (session?.user) {
-                fetchProfile(session.user.id)
+                fetchProfile(session.user)
             } else {
                 setLoading(false)
             }
@@ -44,9 +57,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setSession(session)
             setUser(session?.user ?? null)
             if (session?.user) {
-                fetchProfile(session.user.id)
+                fetchProfile(session.user)
             } else {
                 setProfile(null)
+                setPermissions(null)
                 setLoading(false)
             }
         })
@@ -54,19 +68,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => subscription.unsubscribe()
     }, [])
 
-    async function fetchProfile(userId: string) {
+    async function fetchProfile(currentUser: User) {
         try {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', userId)
+                .eq('id', currentUser.id)
                 .single()
 
             if (error) {
                 console.error('Error fetching profile:', error)
-            } else {
-                setProfile(data)
             }
+
+            let finalRole: UserRole = data?.role ?? 'subscriber'
+
+            // Enforce fallaturia@gmail.com is always admin
+            if (currentUser.email === 'fallaturia@gmail.com') {
+                finalRole = 'admin'
+                if (data && data.role !== 'admin') {
+                    // Try to auto-correct in the background without blocking
+                    supabase.from('profiles').update({ role: 'admin' }).eq('id', currentUser.id).then()
+                }
+            }
+
+            if (data) {
+                setProfile({ ...data, role: finalRole })
+            } else {
+                setProfile(null) // Handle edge case if profile missing
+            }
+
+            // Fetch permissions
+            const { data: permData } = await supabase
+                .from('role_permissions')
+                .select('*')
+                .eq('role', finalRole)
+                .single()
+
+            if (permData) {
+                setPermissions(permData)
+            } else if (finalRole === 'admin') {
+                // Failsafe in case the table hasn't been created yet
+                setPermissions({
+                    can_manage_agenda: true,
+                    can_manage_gallery: true,
+                    can_manage_news: true,
+                    can_manage_clothing: true,
+                    can_manage_lottery: true,
+                    can_manage_actas: true,
+                    can_manage_roles: true
+                })
+            } else {
+                setPermissions(null)
+            }
+
         } catch (error) {
             console.error('Error:', error)
         } finally {
@@ -74,12 +128,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
-    // Default to 'subscriber' if logged in but no role, or null if not logged in
     const role: UserRole | null = profile?.role ?? (user ? 'subscriber' : null)
 
     const checkPermission = (allowedRoles: UserRole[]): boolean => {
         if (!role) return false
         return allowedRoles.includes(role)
+    }
+
+    const hasPermission = (permission: keyof RolePermissions): boolean => {
+        if (role === 'admin' || user?.email === 'fallaturia@gmail.com') return true
+        if (!permissions) return false
+        return permissions[permission] === true
     }
 
     const signOut = async () => {
@@ -116,12 +175,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             })
         } catch (err) {
             console.error('Failed to notify admin:', err)
-            // Don't block sign up success
         }
 
         // Trigger n8n webhook
         try {
-            // Using Netlify proxy to bypass CORS
             await fetch('/api/webhook-register', {
                 method: 'POST',
                 headers: {
@@ -139,7 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider value={{ session, user, profile, role, loading, checkPermission, signOut, signIn, signUp }}>
+        <AuthContext.Provider value={{ session, user, profile, role, permissions, loading, checkPermission, hasPermission, signOut, signIn, signUp }}>
             {children}
         </AuthContext.Provider>
     )

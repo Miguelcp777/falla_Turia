@@ -5,10 +5,10 @@ import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSiteConfig } from '@/context/SiteConfigContext'
 
-type Tab = 'news' | 'agenda' | 'lottery' | 'users' | 'representatives' | 'gallery' | 'clothing' | 'settings'
+type Tab = 'news' | 'agenda' | 'lottery' | 'users' | 'representatives' | 'gallery' | 'clothing' | 'settings' | 'roles'
 
 export default function Dashboard() {
-    const { role } = useAuth()
+    const { role, hasPermission } = useAuth()
     const { t } = useLanguage()
     const { currentYear, plantaDate, updateSiteConfig } = useSiteConfig()
 
@@ -46,6 +46,9 @@ export default function Dashboard() {
     // Users Management
     const [allUsers, setAllUsers] = useState<Profile[]>([])
 
+    // Roles Permissions
+    const [rolePermissionsData, setRolePermissionsData] = useState<any[]>([])
+
     // Representatives Form
     const [repsList, setRepsList] = useState<any[]>([])
     const [editingRepId, setEditingRepId] = useState<string | null>(null)
@@ -82,8 +85,10 @@ export default function Dashboard() {
     useEffect(() => {
         if (activeTab === 'lottery') {
             fetchLotteryConfig()
-        } else if (activeTab === 'users' && (role === 'admin' || role === 'editor')) {
+        } else if (activeTab === 'users' && hasPermission('can_manage_roles')) {
             fetchUsers()
+        } else if (activeTab === 'roles' && hasPermission('can_manage_roles')) {
+            fetchRolePermissions()
         } else if (activeTab === 'news') {
             fetchNews()
         } else if (activeTab === 'agenda') {
@@ -105,7 +110,7 @@ export default function Dashboard() {
                 setSettingsPlantaDate(local.toISOString().slice(0, 16))
             }
         }
-    }, [activeTab, role])
+    }, [activeTab, hasPermission])
 
     const fetchNews = async () => {
         const { data } = await supabase
@@ -132,6 +137,21 @@ export default function Dashboard() {
 
         if (data) {
             setRepsList(data)
+        }
+    }
+
+    const fetchRolePermissions = async () => {
+        const { data } = await supabase.from('role_permissions').select('*').order('role')
+        if (data) setRolePermissionsData(data)
+    }
+
+    const handleUpdateRolePermission = async (roleName: string, field: string, value: boolean) => {
+        try {
+            const { error } = await supabase.from('role_permissions').update({ [field]: value }).eq('role', roleName)
+            if (error) throw error
+            setRolePermissionsData(prev => prev.map(r => r.role === roleName ? { ...r, [field]: value } : r))
+        } catch (e: any) {
+            alert('Error updating permission: ' + e.message)
         }
     }
 
@@ -765,37 +785,43 @@ export default function Dashboard() {
                 </div>
 
                 <div className="flex flex-wrap gap-4 mb-8">
-                    <button
-                        onClick={() => setActiveTab('news')}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'news'
-                            ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                            : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
-                            }`}
-                    >
-                        <Newspaper size={20} />
-                        {t('dashboard.tabs.news')}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('agenda')}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'agenda'
-                            ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                            : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
-                            }`}
-                    >
-                        <Calendar size={20} />
-                        {t('dashboard.tabs.agenda')}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('lottery')}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'lottery'
-                            ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                            : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
-                            }`}
-                    >
-                        <Clover size={20} />
-                        {t('dashboard.tabs.lottery')}
-                    </button>
-                    {(role === 'admin' || role === 'editor') && (
+                    {hasPermission('can_manage_news') && (
+                        <button
+                            onClick={() => setActiveTab('news')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'news'
+                                ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
+                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                }`}
+                        >
+                            <Newspaper size={20} />
+                            {t('dashboard.tabs.news')}
+                        </button>
+                    )}
+                    {hasPermission('can_manage_agenda') && (
+                        <button
+                            onClick={() => setActiveTab('agenda')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'agenda'
+                                ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
+                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                }`}
+                        >
+                            <Calendar size={20} />
+                            {t('dashboard.tabs.agenda')}
+                        </button>
+                    )}
+                    {hasPermission('can_manage_lottery') && (
+                        <button
+                            onClick={() => setActiveTab('lottery')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'lottery'
+                                ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
+                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                }`}
+                        >
+                            <Clover size={20} />
+                            {t('dashboard.tabs.lottery')}
+                        </button>
+                    )}
+                    {hasPermission('can_manage_gallery') && (
                         <button
                             onClick={() => setActiveTab('gallery')}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'gallery'
@@ -807,40 +833,52 @@ export default function Dashboard() {
                             {t('dashboard.tabs.gallery')}
                         </button>
                     )}
-                    {(role === 'admin' || role === 'editor') && (
+                    {hasPermission('can_manage_roles') && (
+                        <>
+                            <button
+                                onClick={() => setActiveTab('users')}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'users'
+                                    ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
+                                    : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                    }`}
+                            >
+                                <Users size={20} />
+                                {t('dashboard.tabs.users')}
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('roles')}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'roles'
+                                    ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
+                                    : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                    }`}
+                            >
+                                <Shield size={20} />
+                                Permisos
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('representatives')}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'representatives'
+                                    ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
+                                    : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                    }`}
+                            >
+                                <Crown size={20} />
+                                {t('nav.institution')}
+                            </button>
+                        </>
+                    )}
+                    {hasPermission('can_manage_clothing') && (
                         <button
-                            onClick={() => setActiveTab('users')}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'users'
+                            onClick={() => setActiveTab('clothing')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'clothing'
                                 ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
                                 : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
                                 }`}
                         >
-                            <Users size={20} />
-                            {t('dashboard.tabs.users')}
+                            <ShoppingBag size={20} />
+                            {t('dashboard.tabs.clothing')}
                         </button>
                     )}
-                    {(role === 'admin' || role === 'editor') && (
-                        <button
-                            onClick={() => setActiveTab('representatives')}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'representatives'
-                                ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
-                                }`}
-                        >
-                            <Crown size={20} />
-                            {t('nav.institution')}
-                        </button>
-                    )}
-                    <button
-                        onClick={() => setActiveTab('clothing')}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'clothing'
-                            ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                            : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
-                            }`}
-                    >
-                        <ShoppingBag size={20} />
-                        {t('dashboard.tabs.clothing')}
-                    </button>
                     {role === 'admin' && (
                         <button
                             onClick={() => setActiveTab('settings')}
@@ -1211,7 +1249,7 @@ export default function Dashboard() {
                         </form>
                     )}
 
-                    {activeTab === 'users' && (role === 'admin' || role === 'editor') && (
+                    {activeTab === 'users' && hasPermission('can_manage_roles') && (
                         <div className="space-y-6">
                             <h2 className="text-2xl font-bold text-white mb-6">{t('dashboard.users.title')}</h2>
 
@@ -1368,7 +1406,61 @@ export default function Dashboard() {
                         </div>
                     )}
 
-                    {activeTab === 'representatives' && (role === 'admin' || role === 'editor') && (
+                    {activeTab === 'roles' && hasPermission('can_manage_roles') && (
+                        <div className="space-y-6">
+                            <h2 className="text-2xl font-bold text-white mb-6">Permisos de Roles</h2>
+                            <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left">
+                                        <thead className="bg-black/50 border-b border-white/10">
+                                            <tr>
+                                                <th className="py-4 px-4 text-sm font-semibold text-primary">Rol</th>
+                                                <th className="py-4 px-4 text-sm font-semibold text-gray-300">Agenda</th>
+                                                <th className="py-4 px-4 text-sm font-semibold text-gray-300">Galería</th>
+                                                <th className="py-4 px-4 text-sm font-semibold text-gray-300">Noticias</th>
+                                                <th className="py-4 px-4 text-sm font-semibold text-gray-300">Indumentaria</th>
+                                                <th className="py-4 px-4 text-sm font-semibold text-gray-300">Lotería</th>
+                                                <th className="py-4 px-4 text-sm font-semibold text-gray-300">Actas</th>
+                                                <th className="py-4 px-4 text-sm font-semibold text-gray-300">Roles</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5">
+                                            {rolePermissionsData.map(rp => (
+                                                <tr key={rp.role} className="hover:bg-white/5 transition-colors">
+                                                    <td className="py-4 px-4">
+                                                        <span className="font-semibold text-white capitalize">{rp.role}</span>
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <input type="checkbox" checked={rp.can_manage_agenda} onChange={(e) => handleUpdateRolePermission(rp.role, 'can_manage_agenda', e.target.checked)} className="w-5 h-5 accent-primary cursor-pointer" disabled={rp.role === 'admin'} />
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <input type="checkbox" checked={rp.can_manage_gallery} onChange={(e) => handleUpdateRolePermission(rp.role, 'can_manage_gallery', e.target.checked)} className="w-5 h-5 accent-primary cursor-pointer" disabled={rp.role === 'admin'} />
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <input type="checkbox" checked={rp.can_manage_news} onChange={(e) => handleUpdateRolePermission(rp.role, 'can_manage_news', e.target.checked)} className="w-5 h-5 accent-primary cursor-pointer" disabled={rp.role === 'admin'} />
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <input type="checkbox" checked={rp.can_manage_clothing} onChange={(e) => handleUpdateRolePermission(rp.role, 'can_manage_clothing', e.target.checked)} className="w-5 h-5 accent-primary cursor-pointer" disabled={rp.role === 'admin'} />
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <input type="checkbox" checked={rp.can_manage_lottery} onChange={(e) => handleUpdateRolePermission(rp.role, 'can_manage_lottery', e.target.checked)} className="w-5 h-5 accent-primary cursor-pointer" disabled={rp.role === 'admin'} />
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <input type="checkbox" checked={rp.can_manage_actas} onChange={(e) => handleUpdateRolePermission(rp.role, 'can_manage_actas', e.target.checked)} className="w-5 h-5 accent-primary cursor-pointer" disabled={rp.role === 'admin'} />
+                                                    </td>
+                                                    <td className="py-4 px-4">
+                                                        <input type="checkbox" checked={rp.can_manage_roles} onChange={(e) => handleUpdateRolePermission(rp.role, 'can_manage_roles', e.target.checked)} className="w-5 h-5 accent-primary cursor-pointer" disabled={rp.role === 'admin'} />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'representatives' && hasPermission('can_manage_roles') && (
                         <div className="space-y-10">
                             {/* Form */}
                             <form onSubmit={handleCreateOrUpdateRepresentative} className="space-y-6 max-w-2xl bg-white/5 p-6 rounded-2xl border border-white/5">
@@ -1511,7 +1603,7 @@ export default function Dashboard() {
                         </div>
                     )}
 
-                    {activeTab === 'gallery' && (role === 'admin' || role === 'editor') && (
+                    {activeTab === 'gallery' && hasPermission('can_manage_gallery') && (
                         <div className="space-y-12">
                             <div className="max-w-2xl">
                                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">

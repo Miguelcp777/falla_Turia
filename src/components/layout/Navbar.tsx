@@ -6,8 +6,17 @@ import { Menu, X, LogOut, Shield, User, ShoppingBag } from 'lucide-react'
 import { useState } from 'react'
 
 export default function Navbar() {
-    const { user, profile, checkPermission, signOut } = useAuth()
+    const { user, profile, checkPermission, hasPermission, signOut } = useAuth()
     const { language, setLanguage, t } = useLanguage()
+
+    const canAccessAdmin = hasPermission('can_manage_news') || 
+                           hasPermission('can_manage_agenda') || 
+                           hasPermission('can_manage_lottery') || 
+                           hasPermission('can_manage_gallery') || 
+                           hasPermission('can_manage_clothing') || 
+                           hasPermission('can_manage_roles') || 
+                           hasPermission('can_manage_actas')
+
     const { items, setIsOpen: setIsCartOpen } = useCart()
     const navigate = useNavigate()
     const location = useLocation()
@@ -100,7 +109,7 @@ export default function Navbar() {
                                 </>
                             )}
 
-                            {checkPermission(['admin', 'editor', 'author', 'directivo/a']) && (
+                            {canAccessAdmin && (
                                 <Link to="/admin" className="bg-primary/10 text-primary hover:bg-primary/20 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] flex items-center gap-2">
                                     <Shield size={16} />
                                     {t('nav.panel')}
@@ -219,7 +228,7 @@ export default function Navbar() {
                             </>
                         )}
                         
-                        {checkPermission(['admin', 'editor', 'author', 'directivo/a']) && (
+                        {canAccessAdmin && (
                             <Link to="/admin" onClick={() => setIsOpen(false)} className="text-primary hover:text-red-400 block px-3 py-2 rounded-md text-base font-medium font-bold">{t('nav.panel')}</Link>
                         )}
 
