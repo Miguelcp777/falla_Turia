@@ -1,16 +1,15 @@
+functionsDirectory = "C:\\Users\\migue\\Documents\\Proyectos antigravity\\Falla Turia\\netlify\\functions"
+functionsDirectoryOrigin = "default"
 redirectsOrigin = "config"
 plugins = []
 headers = []
-
-[functions]
-
-[functions."*"]
 
 [build]
 publish = "C:\\Users\\migue\\Documents\\Proyectos antigravity\\Falla Turia\\dist"
 publishOrigin = "config"
 commandOrigin = "config"
 command = "npm run build"
+functions = "C:\\Users\\migue\\Documents\\Proyectos antigravity\\Falla Turia\\netlify\\functions"
 
 [build.environment]
 
@@ -25,6 +24,10 @@ command = "npm run build"
 [build.processing.js]
 
 [build.services]
+
+[functions]
+
+[functions."*"]
 
 [[redirects]]
 from = "/api/webhook-register"
