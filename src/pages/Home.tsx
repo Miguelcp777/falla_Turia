@@ -42,8 +42,8 @@ export default function Home() {
                     {t('home.subtitle')}
                 </p>
 
-                <NextEventBanner />
                 <Countdown />
+                <NextEventBanner />
             </div>
 
             {/* Representatives Teaser */}
