@@ -28,6 +28,7 @@ functions = "C:\\Users\\migue\\Documents\\Proyectos antigravity\\Falla Turia\\ne
 [functions]
 
 [functions."*"]
+included_files = ["node_modules/pdf-parse/**"]
 
 [[redirects]]
 from = "/api/webhook-register"
