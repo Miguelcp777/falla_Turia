@@ -19,6 +19,8 @@ import Institution from '@/pages/Institution'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import FireBackground from '@/components/layout/FireBackground'
 
+import TurianinChat from '@/components/TurianinChat'
+
 function App() {
     return (
         <AuthProvider>
@@ -65,6 +67,9 @@ function App() {
                                     <Route path="/admin" element={<Dashboard />} />
                                 </Route>
                             </Routes>
+
+                            {/* Turianin AI Chatbot */}
+                            <TurianinChat />
                         </div>
                     </BrowserRouter>
                 </CartProvider>
