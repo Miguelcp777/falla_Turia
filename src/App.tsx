@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { ThemeProvider } from '@/context/ThemeContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { LanguageProvider } from '@/context/LanguageContext'
 import { CartProvider } from '@/context/CartContext'
@@ -23,59 +24,61 @@ import TurianinChat from '@/components/TurianinChat'
 
 function App() {
     return (
-        <AuthProvider>
-            <SiteConfigProvider>
-            <LanguageProvider>
-                <CartProvider>
-                    <BrowserRouter>
-                        <div className="min-h-screen font-display relative overflow-hidden">
-                            <FireBackground />
+        <ThemeProvider>
+            <AuthProvider>
+                <SiteConfigProvider>
+                    <LanguageProvider>
+                        <CartProvider>
+                            <BrowserRouter>
+                                <div className="min-h-screen font-display relative overflow-hidden transition-colors duration-500">
+                                    <FireBackground />
 
-                            {/* Decorative Background Image - Global */}
-                            <div className="absolute top-0 left-0 h-full w-1/2 z-0 pointer-events-none overflow-hidden hidden md:block">
-                                <div className="absolute top-1/2 -left-20 -translate-y-1/2 w-full h-[120%] -rotate-6 opacity-40 mix-blend-screen">
-                                    <img
-                                        src="/bat_falla.jpg"
-                                        alt="Falla Turia Art"
-                                        className="w-full h-full object-cover"
-                                        style={{ maskImage: 'linear-gradient(to right, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 100%)' }}
-                                    />
+                                    {/* Decorative Background Image - Global */}
+                                    <div className="absolute top-0 left-0 h-full w-1/2 z-0 pointer-events-none overflow-hidden hidden md:block">
+                                        <div className="absolute top-1/2 -left-20 -translate-y-1/2 w-full h-[120%] -rotate-6 opacity-40 mix-blend-screen dark:mix-blend-screen">
+                                            <img
+                                                src="/bat_falla.jpg"
+                                                alt="Falla Turia Art"
+                                                className="w-full h-full object-cover"
+                                                style={{ maskImage: 'linear-gradient(to right, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black 0%, transparent 100%)' }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <Navbar />
+                                    <Routes>
+                                        {/* Public Routes */}
+                                        <Route path="/" element={<Home />} />
+                                        <Route path="/login" element={<Login />} />
+                                        <Route path="/institution" element={<Institution />} />
+                                        <Route path="/reset-password" element={<ResetPassword />} />
+                                        <Route path="/news" element={<News />} />
+                                        <Route path="/representatives" element={<Representatives />} />
+
+                                        {/* Member Routes - Accessible by all authenticated users */}
+                                        <Route element={<ProtectedRoute allowedRoles={['subscriber', 'author', 'editor', 'admin', 'directivo/a']} />}>
+                                            <Route path="/agenda" element={<Agenda />} />
+                                            <Route path="/lottery" element={<Lottery />} />
+                                            <Route path="/gallery" element={<Gallery />} />
+                                            <Route path="/clothing" element={<Clothing />} />
+                                            <Route path="/suggestions" element={<Suggestions />} />
+                                        </Route>
+
+                                        {/* Admin/Content Routes */}
+                                        <Route element={<ProtectedRoute allowedRoles={['admin', 'editor', 'author', 'directivo/a']} />}>
+                                            <Route path="/admin" element={<Dashboard />} />
+                                        </Route>
+                                    </Routes>
+
+                                    {/* Turianin AI Chatbot */}
+                                    <TurianinChat />
                                 </div>
-                            </div>
-
-                            <Navbar />
-                            <Routes>
-                                {/* Public Routes */}
-                                <Route path="/" element={<Home />} />
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/institution" element={<Institution />} />
-                                <Route path="/reset-password" element={<ResetPassword />} />
-                                <Route path="/news" element={<News />} />
-                                <Route path="/representatives" element={<Representatives />} />
-
-                                {/* Member Routes - Accessible by all authenticated users */}
-                                <Route element={<ProtectedRoute allowedRoles={['subscriber', 'author', 'editor', 'admin', 'directivo/a']} />}>
-                                    <Route path="/agenda" element={<Agenda />} />
-                                    <Route path="/lottery" element={<Lottery />} />
-                                    <Route path="/gallery" element={<Gallery />} />
-                                    <Route path="/clothing" element={<Clothing />} />
-                                    <Route path="/suggestions" element={<Suggestions />} />
-                                </Route>
-
-                                {/* Admin/Content Routes */}
-                                <Route element={<ProtectedRoute allowedRoles={['admin', 'editor', 'author', 'directivo/a']} />}>
-                                    <Route path="/admin" element={<Dashboard />} />
-                                </Route>
-                            </Routes>
-
-                            {/* Turianin AI Chatbot */}
-                            <TurianinChat />
-                        </div>
-                    </BrowserRouter>
-                </CartProvider>
-            </LanguageProvider>
-            </SiteConfigProvider>
-        </AuthProvider>
+                            </BrowserRouter>
+                        </CartProvider>
+                    </LanguageProvider>
+                </SiteConfigProvider>
+            </AuthProvider>
+        </ThemeProvider>
     )
 }
 

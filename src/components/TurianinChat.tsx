@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { X, Send, Loader2 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
+import { useTheme } from '@/context/ThemeContext'
 
 interface Message {
     role: 'user' | 'assistant'
@@ -14,6 +15,7 @@ const WELCOME_MESSAGE: Message = {
 
 export default function TurianinChat() {
     const { user } = useAuth()
+    const { theme } = useTheme()
     const [isOpen, setIsOpen] = useState(false)
     const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE])
     const [input, setInput] = useState('')
@@ -103,9 +105,14 @@ export default function TurianinChat() {
                     : 'opacity-0 scale-90 translate-y-8 pointer-events-none'
                     }`}
                 style={{
-                    background: 'linear-gradient(145deg, rgba(15,10,25,0.97) 0%, rgba(25,8,35,0.97) 100%)',
-                    border: '1px solid rgba(239,68,68,0.3)',
-                    backdropFilter: 'blur(20px)'
+                    background: theme === 'dark' 
+                        ? 'linear-gradient(145deg, rgba(15,10,25,0.97) 0%, rgba(25,8,35,0.97) 100%)'
+                        : 'rgba(255, 255, 255, 0.98)',
+                    border: theme === 'dark' 
+                        ? '1px solid rgba(239,68,68,0.3)' 
+                        : '1px solid rgba(0,0,0,0.1)',
+                    backdropFilter: 'blur(20px)',
+                    color: theme === 'dark' ? 'white' : '#1e293b'
                 }}
             >
                 {/* Header */}
@@ -150,7 +157,9 @@ export default function TurianinChat() {
                             <div
                                 className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
                                     ? 'bg-gradient-to-br from-red-600 to-red-800 text-white rounded-tr-sm'
-                                    : 'bg-white/10 text-gray-100 rounded-tl-sm border border-white/10'
+                                    : theme === 'dark' 
+                                        ? 'bg-white/10 text-gray-100 rounded-tl-sm border border-white/10'
+                                        : 'bg-gray-100 text-slate-800 rounded-tl-sm border border-gray-200'
                                     }`}
                                 style={{ wordBreak: 'break-word' }}
                             >
@@ -162,7 +171,7 @@ export default function TurianinChat() {
                     {loading && (
                         <div className="flex gap-2 items-center">
                             <img src="/turianin-logo.png" alt="Turianin" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
-                            <div className="bg-white/10 border border-white/10 rounded-2xl rounded-tl-sm px-4 py-3">
+                            <div className={`${theme === 'dark' ? 'bg-white/10 border-white/10' : 'bg-gray-100 border-gray-200'} border rounded-2xl rounded-tl-sm px-4 py-3`}>
                                 <div className="flex gap-1 items-center">
                                     <span className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                                     <span className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -175,8 +184,12 @@ export default function TurianinChat() {
                 </div>
 
                 {/* Input */}
-                <div className="p-3 border-t border-white/10">
-                    <div className="flex gap-2 items-center bg-white/5 rounded-2xl px-3 py-2 border border-white/10 focus-within:border-red-500/50 transition-colors">
+                <div className={`p-3 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
+                    <div className={`flex gap-2 items-center rounded-2xl px-3 py-2 border transition-colors ${
+                        theme === 'dark' 
+                        ? 'bg-white/5 border-white/10 focus-within:border-red-500/50' 
+                        : 'bg-gray-50 border-gray-200 focus-within:border-red-500/50'
+                    }`}>
                         <input
                             ref={inputRef}
                             type="text"
@@ -184,7 +197,7 @@ export default function TurianinChat() {
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
                             placeholder="Pregunta a Turianin..."
-                            className="flex-1 bg-transparent text-white text-sm placeholder-gray-500 focus:outline-none"
+                            className={`flex-1 bg-transparent text-sm placeholder-gray-500 focus:outline-none ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}
                             disabled={loading}
                         />
                         <button
@@ -195,7 +208,7 @@ export default function TurianinChat() {
                             {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                         </button>
                     </div>
-                    <p className="text-center text-gray-600 text-[10px] mt-1.5">Turianin · Falla Turia IA 🦇</p>
+                    <p className={`text-center text-[10px] mt-1.5 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`}>Turianin · Falla Turia IA 🦇</p>
                 </div>
             </div>
 

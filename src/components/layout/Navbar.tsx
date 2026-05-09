@@ -2,12 +2,14 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useCart } from '@/context/CartContext'
-import { Menu, X, LogOut, Shield, User, ShoppingBag } from 'lucide-react'
+import { useTheme } from '@/context/ThemeContext'
+import { Menu, X, LogOut, Shield, User, ShoppingBag, Sun, Moon } from 'lucide-react'
 import { useState } from 'react'
 
 export default function Navbar() {
     const { user, profile, checkPermission, hasPermission, signOut } = useAuth()
     const { language, setLanguage, t } = useLanguage()
+    const { theme, toggleTheme } = useTheme()
 
     const canAccessAdmin = hasPermission('can_manage_news') || 
                            hasPermission('can_manage_agenda') || 
@@ -132,21 +134,29 @@ export default function Navbar() {
                             )}
                         </button>
 
-                        {/* Language Switcher */}
-                        <div className="flex items-center gap-2 bg-surface-dark border border-white/10 rounded-full p-1">
+                        <div className="flex items-center gap-2">
+                            {/* Theme Toggle */}
+                            <button
+                                onClick={toggleTheme}
+                                className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-all"
+                                title={theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
+                            >
+                                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} className="text-primary" />}
+                            </button>
+
                             <button
                                 onClick={() => setLanguage('es')}
-                                className={`p-1.5 rounded-full transition-all ${language === 'es' ? 'bg-white/10 ring-1 ring-white/20' : 'opacity-50 hover:opacity-100'}`}
-                                aria-label="Español"
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${language === 'es' ? 'bg-primary text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
                             >
                                 <FlagES />
+                                <span>ES</span>
                             </button>
                             <button
-                                onClick={() => setLanguage('va')}
-                                className={`p-1.5 rounded-full transition-all ${language === 'va' ? 'bg-white/10 ring-1 ring-white/20' : 'opacity-50 hover:opacity-100'}`}
-                                aria-label="Valencià"
+                                onClick={() => setLanguage('ca')}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${language === 'ca' ? 'bg-primary text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
                             >
                                 <FlagVA />
+                                <span>VAL</span>
                             </button>
                         </div>
 
