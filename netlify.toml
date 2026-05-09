@@ -2,6 +2,9 @@
   command = "npm run build"
   publish = "dist"
 
+[functions]
+  included_files = ["node_modules/pdf-parse/**"]
+
 [[redirects]]
   from = "/api/webhook-register"
   to = "https://n8n.i-automate.es/webhook/a75d7fa4-6bb4-4691-88ca-01850bb41add"
