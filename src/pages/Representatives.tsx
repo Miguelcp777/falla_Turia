@@ -42,10 +42,10 @@ export default function Representatives() {
                         <div className="inline-flex items-center justify-center p-3 bg-secondary/10 rounded-full mb-6 border border-secondary/20 backdrop-blur-sm">
                             <Crown className="w-8 h-8 text-secondary" />
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-display font-bold text-white mb-6">
+                        <h1 className="text-5xl md:text-6xl font-display font-bold text-slate-900 dark:text-white mb-6 transition-colors duration-500">
                             {t('representatives.title')}
                         </h1>
-                        <p className="text-xl text-gray-300 max-w-2xl mx-auto font-light">
+                        <p className="text-xl text-slate-500 dark:text-gray-300 max-w-2xl mx-auto font-light transition-colors duration-500">
                             {t('representatives.subtitle')}
                         </p>
                     </div>
@@ -63,7 +63,7 @@ export default function Representatives() {
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                                    <div className="relative bg-surface-dark border border-white/10 rounded-[2.5rem] p-8 md:p-10 overflow-hidden hover:border-secondary/30 transition-all duration-500 h-full">
+                                    <div className="relative bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/10 rounded-[2.5rem] p-8 md:p-10 overflow-hidden hover:border-secondary/30 transition-all duration-500 h-full shadow-sm dark:shadow-none">
                                         {/* Decorative elements */}
                                         <div className="absolute top-0 right-0 p-8 opacity-10">
                                             <Crown size={120} />
@@ -90,11 +90,11 @@ export default function Representatives() {
                                                     {t(`representatives.roles.${rep.role}`)}
                                                 </div>
 
-                                                <h3 className="text-3xl font-display font-bold text-white mb-4">
+                                                <h3 className="text-3xl font-display font-bold text-slate-900 dark:text-white mb-4 transition-colors duration-500">
                                                     {rep.name || t('representatives.empty_name')}
                                                 </h3>
 
-                                                <p className="text-gray-400 leading-relaxed">
+                                                <p className="text-slate-500 dark:text-gray-400 leading-relaxed transition-colors duration-500">
                                                     {rep.description || t('representatives.empty_desc')}
                                                 </p>
                                             </div>

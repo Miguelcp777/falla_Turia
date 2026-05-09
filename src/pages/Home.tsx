@@ -28,7 +28,7 @@ export default function Home() {
             <div className="relative z-10 container mx-auto px-6 pt-20 pb-20 text-center">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 backdrop-blur-sm border border-primary/20 mb-8 animate-fire-flicker">
                     <img src="/escudo.jpg" alt="Escudo" className="w-5 h-5 object-contain rounded-full" />
-                    <span className="text-sm font-bold text-red-200 tracking-wide uppercase">Falles {currentYear}</span>
+                    <span className="text-sm font-bold text-primary dark:text-red-200 tracking-wide uppercase">Falles {currentYear}</span>
                 </div>
 
                 <div className="relative mb-12 group">
@@ -38,7 +38,7 @@ export default function Home() {
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-orange-500/20 via-red-500/20 to-primary/20 blur-3xl opacity-50 animate-pulse-slow -z-10 rounded-full"></div>
                 </div>
 
-                <p className="text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-gray-200 via-white to-gray-200 max-w-2xl mx-auto mb-10 font-bold leading-relaxed uppercase tracking-[0.2em] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] border-y border-white/5 py-6 backdrop-blur-sm bg-white/5 rounded-2xl">
+                <p className="text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-slate-600 via-slate-900 to-slate-600 dark:from-gray-200 dark:via-white dark:to-gray-200 max-w-2xl mx-auto mb-10 font-bold leading-relaxed uppercase tracking-[0.2em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] border-y border-black/5 dark:border-white/5 py-6 backdrop-blur-sm bg-black/5 dark:bg-white/5 rounded-2xl transition-all duration-500">
                     {t('home.subtitle')}
                 </p>
 
@@ -48,8 +48,8 @@ export default function Home() {
 
             {/* Representatives Teaser */}
             <div className="relative z-10 container mx-auto px-6 mb-12">
-                <div className="max-w-5xl mx-auto bg-surface-dark/50 backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-12 overflow-hidden relative group">
-                    <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                <div className="max-w-5xl mx-auto bg-white/80 dark:bg-surface-dark/50 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-3xl p-8 md:p-12 overflow-hidden relative group transition-colors duration-500">
+                    <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none text-slate-900 dark:text-white">
                         <Crown size={200} />
                     </div>
 
@@ -59,10 +59,10 @@ export default function Home() {
                                 <Crown size={14} />
                                 <span>{t('representatives.honor_roll')}</span>
                             </div>
-                            <h2 className="text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-100 to-gray-300 mb-6 leading-tight drop-shadow-lg">
+                            <h2 className="text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 dark:from-white dark:via-gray-100 dark:to-gray-300 mb-6 leading-tight drop-shadow-sm dark:drop-shadow-lg">
                                 {t('representatives.title')} <span className="text-secondary drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">{currentYear}</span>
                             </h2>
-                            <p className="text-gray-300 mb-8 text-lg font-light leading-relaxed">
+                            <p className="text-slate-600 dark:text-gray-300 mb-8 text-lg font-light leading-relaxed">
                                 {t('representatives.home_subtitle')}
                             </p>
                             <Link
@@ -146,12 +146,12 @@ export default function Home() {
                             {/* Email */}
                             <a
                                 href="mailto:fallaturia@gmail.com"
-                                className="group flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-6 py-4 hover:bg-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)] active:scale-95"
+                                className="group flex items-center gap-3 bg-black/5 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/10 rounded-2xl px-6 py-4 hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)] active:scale-95"
                             >
                                 <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
                                     <Mail className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
                                 </div>
-                                <span className="text-white font-medium group-hover:text-primary transition-colors">fallaturia@gmail.com</span>
+                                <span className="text-slate-900 dark:text-white font-medium group-hover:text-primary transition-colors">fallaturia@gmail.com</span>
                             </a>
 
                             {/* Facebook */}
@@ -159,12 +159,12 @@ export default function Home() {
                                 href="https://www.facebook.com/fallaturia/"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-6 py-4 hover:bg-white/10 hover:border-blue-500/50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] active:scale-95"
+                                className="group flex items-center gap-3 bg-black/5 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/10 rounded-2xl px-6 py-4 hover:bg-black/10 dark:hover:bg-white/10 hover:border-blue-500/50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] active:scale-95"
                             >
                                 <div className="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 transition-colors">
                                     <Facebook className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
                                 </div>
-                                <span className="text-white font-medium group-hover:text-blue-400 transition-colors">Falla Turia</span>
+                                <span className="text-slate-900 dark:text-white font-medium group-hover:text-blue-400 transition-colors">Falla Turia</span>
                             </a>
 
                             {/* Instagram */}
@@ -172,12 +172,12 @@ export default function Home() {
                                 href="https://www.instagram.com/fallaturiajuntament/"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-6 py-4 hover:bg-white/10 hover:border-pink-500/50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] active:scale-95"
+                                className="group flex items-center gap-3 bg-black/5 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/10 rounded-2xl px-6 py-4 hover:bg-black/10 dark:hover:bg-white/10 hover:border-pink-500/50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] active:scale-95"
                             >
                                 <div className="p-2 bg-pink-500/10 rounded-lg group-hover:bg-pink-500/20 transition-colors">
                                     <Instagram className="w-5 h-5 text-pink-500 group-hover:scale-110 transition-transform" />
                                 </div>
-                                <span className="text-white font-medium group-hover:text-pink-400 transition-colors">@fallaturiajuntament</span>
+                                <span className="text-slate-900 dark:text-white font-medium group-hover:text-pink-400 transition-colors">@fallaturiajuntament</span>
                             </a>
                         </div>
                     </div>

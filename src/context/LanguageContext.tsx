@@ -21,7 +21,8 @@ export const translations = {
             access: 'Acceso Falleros',
             representatives: 'Representantes',
             gallery: 'Galería',
-            clothing: 'Ropa'
+            clothing: 'Ropa',
+            directiva: 'Directiva'
         },
         home: {
             title: 'Pasión, Fuego, Fiesta y Tradición',
@@ -244,6 +245,15 @@ export const translations = {
                 saving: 'Guardando...',
                 success: '¡Configuración actualizada!',
                 error: 'Error actualizando configuración'
+            },
+            directiva: {
+                title: 'Gestión de la Directiva',
+                form_name: 'Nombre',
+                form_position: 'Cargo',
+                form_level: 'Nivel (1-Presidente, 2-Vice, 3-Secretaría, 4-Vocal)',
+                form_order: 'Orden',
+                submit_update: 'Actualizar Cargo',
+                alert_updated: 'Directiva actualizada correctamente'
             }
         }
     },
@@ -263,7 +273,8 @@ export const translations = {
             access: 'Accés Fallers',
             representatives: 'Representants',
             gallery: 'Galeria',
-            clothing: 'Indumentària'
+            clothing: 'Indumentària',
+            directiva: 'Directiva'
         },
         home: {
             title: 'Passió, Foc, Festa i Tradició',

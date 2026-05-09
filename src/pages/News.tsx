@@ -167,8 +167,8 @@ export default function News() {
                 )}
 
                 {!loading && !hasNews && (
-                    <div className="text-center py-20 bg-surface-dark/50 rounded-3xl border border-white/5">
-                        <p className="text-gray-400 text-xl">{t('news.empty')}</p>
+                    <div className="text-center py-20 bg-gray-50 dark:bg-surface-dark/50 rounded-3xl border border-gray-200 dark:border-white/5 transition-colors duration-500">
+                        <p className="text-slate-500 dark:text-gray-400 text-xl transition-colors duration-500">{t('news.empty')}</p>
                     </div>
                 )}
             </div>

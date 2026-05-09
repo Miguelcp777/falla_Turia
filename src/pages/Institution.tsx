@@ -104,7 +104,7 @@ export default function Institution() {
 
                             <div className="flex flex-col gap-6 text-center md:text-left z-10 flex-1">
                                 <div className="space-y-1">
-                                    <h2 className="text-3xl font-black text-[#111714] dark:text-white tracking-tight">Saluda del Presidente</h2>
+                                <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight transition-colors duration-500">Saluda del Presidente</h2>
                                     <p className="text-primary font-bold text-lg">{president.name}</p>
                                 </div>
                                 <div className="relative">
@@ -114,7 +114,7 @@ export default function Institution() {
                                     </p>
                                 </div>
                                 <div className="flex justify-center md:justify-start gap-4 pt-2">
-                                    <a className="px-6 py-2.5 rounded-full bg-gray-100 dark:bg-white/5 text-sm font-bold text-[#111714] dark:text-white hover:bg-primary hover:text-white flex items-center gap-2 transition-all duration-300 group-hover:translate-x-1" href="#">
+                                    <a className="px-6 py-2.5 rounded-full bg-gray-100 dark:bg-white/5 text-sm font-bold text-slate-900 dark:text-white hover:bg-primary hover:text-white flex items-center gap-2 transition-all duration-300 group-hover:translate-x-1" href="#">
                                         <span className="material-symbols-outlined text-[18px]">mail</span> Contactar con Presidencia
                                     </a>
                                 </div>
@@ -125,7 +125,7 @@ export default function Institution() {
                     {/* Board Section */}
                     <section>
                         <div className="flex items-center justify-between mb-10 border-b border-gray-200 dark:border-gray-800 pb-4">
-                            <h3 className="text-2xl font-bold text-[#111714] dark:text-white flex items-center gap-3">
+                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3 transition-colors duration-500">
                                 <span className="w-1.5 h-8 bg-primary rounded-full"></span>
                                 Organigrama Actual
                             </h3>
@@ -144,7 +144,7 @@ export default function Institution() {
                                         ></div>
                                         <span className="bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">{getRoleLabel(member.role)}</span>
                                     </div>
-                                    <h4 className="text-xl font-bold text-[#111714] dark:text-white mb-1">{member.name}</h4>
+                                    <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-1 transition-colors duration-500">{member.name}</h4>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">{member.description || getRoleLabel(member.role)}</p>
                                     <div className="flex gap-3 mt-auto border-t border-gray-50 dark:border-gray-800 pt-4">
                                         <button className="w-9 h-9 rounded-full bg-gray-50 dark:bg-background-dark flex items-center justify-center text-gray-500 hover:text-white hover:bg-primary transition-all duration-300">
@@ -166,7 +166,7 @@ export default function Institution() {
                         <section className="mt-8 border-t border-dashed border-gray-300 dark:border-gray-700 pt-16">
                             <div className="flex flex-col gap-6 text-center mb-16">
                                 <span className="text-primary font-bold tracking-widest uppercase text-sm">Representación 2025</span>
-                                <h3 className="text-4xl font-black text-[#111714] dark:text-white tracking-tight">Cuadro de Honor</h3>
+                                <h3 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight transition-colors duration-500">Cuadro de Honor</h3>
                                 <p className="text-gray-500 text-lg max-w-2xl mx-auto">Nuestros máximos representantes para este ejercicio fallero.</p>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 max-w-5xl mx-auto items-end pb-8">
@@ -193,7 +193,7 @@ export default function Institution() {
                                                     </div>
                                                 )}
                                             </div>
-                                            <h4 className={`${titleClass} font-black dark:text-white mb-1`}>{rep.name}</h4>
+                                            <h4 className={`${titleClass} font-black text-slate-900 dark:text-white mb-1 transition-colors duration-500`}>{rep.name}</h4>
                                             <p className="text-lg text-primary font-bold">{rep.year}</p>
                                         </div>
                                     );
@@ -206,7 +206,7 @@ export default function Institution() {
                 <section className="bg-gray-50 dark:bg-surface-dark/50 rounded-2xl p-8 border border-gray-200 dark:border-border-dark">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div>
-                            <h3 className="text-xl font-bold text-[#111714] dark:text-white mb-2 flex items-center gap-2">
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2 transition-colors duration-500">
                                 <span className="material-symbols-outlined text-primary">history_edu</span>
                                 Archivo Histórico
                             </h3>
@@ -216,7 +216,7 @@ export default function Institution() {
                             <div className="relative flex-1 md:w-72">
                                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
                                 <input
-                                    className="w-full pl-10 pr-4 py-3 rounded-full bg-white dark:bg-[#111714] border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-[#111714] dark:text-white placeholder-gray-400"
+                                    className="w-full pl-10 pr-4 py-3 rounded-full bg-white dark:bg-[#111714] border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-slate-900 dark:text-white placeholder-gray-400"
                                     placeholder="Buscar por año o nombre..."
                                     type="text"
                                 />

@@ -17,10 +17,12 @@ import Dashboard from '@/pages/Dashboard'
 import ResetPassword from '@/pages/ResetPassword'
 import Clothing from '@/pages/Clothing'
 import Institution from '@/pages/Institution'
+import Directiva from '@/pages/Directiva'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import FireBackground from '@/components/layout/FireBackground'
 
 import TurianinChat from '@/components/TurianinChat'
+import ActivityTracker from '@/components/ActivityTracker'
 
 function App() {
     return (
@@ -30,6 +32,7 @@ function App() {
                     <LanguageProvider>
                         <CartProvider>
                             <BrowserRouter>
+                                <ActivityTracker />
                                 <div className="min-h-screen font-display relative overflow-hidden transition-colors duration-500">
                                     <FireBackground />
 
@@ -57,6 +60,7 @@ function App() {
 
                                         {/* Member Routes - Accessible by all authenticated users */}
                                         <Route element={<ProtectedRoute allowedRoles={['subscriber', 'author', 'editor', 'admin', 'directivo/a']} />}>
+                                            <Route path="/directiva" element={<Directiva />} />
                                             <Route path="/agenda" element={<Agenda />} />
                                             <Route path="/lottery" element={<Lottery />} />
                                             <Route path="/gallery" element={<Gallery />} />

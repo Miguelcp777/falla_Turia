@@ -49,13 +49,13 @@ const NextEventBanner = () => {
 
     return (
         <div className="flex justify-center mt-8 mb-16 px-4">
-            <div className="relative group overflow-hidden bg-background-dark/80 backdrop-blur-md border border-white/10 pr-8 pl-4 py-6 rounded-2xl transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+            <div className="relative group overflow-hidden bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border border-gray-200 dark:border-white/10 pr-8 pl-4 py-6 rounded-2xl transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(239,68,68,0.2)]">
                 {/* Red/Pink Accent Bar Left */}
                 <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-primary to-pink-500" />
 
                 <div className="flex items-center gap-6 pl-4">
                     {/* Icon container */}
-                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 group-hover:bg-primary/10 transition-colors">
+                    <div className="p-4 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 group-hover:bg-primary/10 transition-colors">
                         <Calendar size={32} className="text-primary group-hover:scale-110 transition-transform duration-300" />
                     </div>
 
@@ -63,13 +63,13 @@ const NextEventBanner = () => {
                         <span className="block text-xs font-bold tracking-widest text-primary uppercase mb-1">
                             {t('home.next_event')}
                         </span>
-                        <h3 className="text-2xl font-bold text-white mb-2 leading-tight">
+                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 leading-tight transition-colors duration-500">
                             {nextEvent.title}
                         </h3>
-                        <div className="flex items-center gap-2 text-gray-400 text-sm font-medium">
+                        <div className="flex items-center gap-2 text-slate-500 dark:text-gray-400 text-sm font-medium">
                             <Clock size={16} className="text-primary/70" />
-                            <span className="text-gray-300 capitalize">{dateStr}</span>
-                            <span className="text-gray-600">•</span>
+                            <span className="text-slate-600 dark:text-gray-300 capitalize">{dateStr}</span>
+                            <span className="text-slate-400 dark:text-gray-600">•</span>
                             <span>{timeStr}h</span>
                         </div>
                     </div>

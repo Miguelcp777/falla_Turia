@@ -41,8 +41,8 @@ const Countdown = () => {
     }, [plantaDate])
 
     const TimeUnit = ({ value, label }: { value: number, label: string }) => (
-        <div className="flex flex-col items-center p-3 bg-background-dark/80 backdrop-blur-sm border border-white/10 rounded-xl min-w-[80px] sm:min-w-[100px]">
-            <span className="text-3xl sm:text-4xl font-bold font-display text-white mb-1">
+        <div className="flex flex-col items-center p-3 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm border border-gray-200 dark:border-white/10 rounded-xl min-w-[80px] sm:min-w-[100px] transition-colors duration-500">
+            <span className="text-3xl sm:text-4xl font-bold font-display text-slate-900 dark:text-white mb-1">
                 {String(value).padStart(2, '0')}
             </span>
             <span className="text-xs sm:text-sm text-primary uppercase font-bold tracking-wider">
@@ -53,7 +53,7 @@ const Countdown = () => {
 
     return (
         <div className="flex flex-col items-center justify-center animate-fade-in-up mt-8 mb-12">
-            <h3 className="text-white font-display text-xl mb-6 tracking-wide font-light opacity-90">
+            <h3 className="text-slate-800 dark:text-white font-display text-xl mb-6 tracking-wide font-light opacity-90 transition-colors duration-500">
                 {t('home.countdown_title')}
             </h3>
             <div className="flex flex-wrap justify-center gap-4">

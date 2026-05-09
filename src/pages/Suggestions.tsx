@@ -43,22 +43,22 @@ export default function Suggestions() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Sidebar / Info */}
                     <div className="md:col-span-1 space-y-6">
-                        <div className="bg-surface-dark border border-white/5 rounded-3xl p-6">
-                            <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                        <div className="bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/5 rounded-3xl p-6 shadow-sm dark:shadow-none transition-colors duration-500">
+                            <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                                 <MessageSquare size={18} className="text-primary" />
                                 {t('suggestions.your_proposals')}
                             </h3>
                             <div className="space-y-4">
-                                <p className="text-gray-400 text-sm italic">
+                                <p className="text-slate-500 dark:text-gray-400 text-sm italic">
                                     {t('suggestions.empty_proposals')}
                                 </p>
                                 {/* Example of sent item */}
-                                <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                                <div className="p-3 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5">
                                     <div className="flex justify-between items-start mb-1">
                                         <span className="text-xs font-bold text-primary">12 MAR</span>
                                         <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">{t('suggestions.status_sent')}</span>
                                     </div>
-                                    <p className="text-gray-300 text-sm line-clamp-2">{t('suggestions.example_proposal')}</p>
+                                    <p className="text-slate-600 dark:text-gray-300 text-sm line-clamp-2">{t('suggestions.example_proposal')}</p>
                                 </div>
                             </div>
                         </div>
@@ -71,8 +71,8 @@ export default function Suggestions() {
                                 <div className="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <CheckCircle size={32} />
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">{t('suggestions.success_title')}</h3>
-                                <p className="text-gray-400">{t('suggestions.success_msg')}</p>
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{t('suggestions.success_title')}</h3>
+                                <p className="text-slate-600 dark:text-gray-400">{t('suggestions.success_msg')}</p>
                             </div>
                         ) : (
                             <div className="bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/5 rounded-3xl p-8 shadow-lg">

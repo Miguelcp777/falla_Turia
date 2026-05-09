@@ -71,31 +71,31 @@ export default function Lottery() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
 
                     {/* Info Card */}
-                    <div className="bg-surface-dark border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
+                    <div className="bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/10 rounded-3xl p-8 relative overflow-hidden group shadow-sm dark:shadow-none transition-colors duration-500">
                         <div className="absolute top-0 right-0 p-32 bg-primary/20 blur-[100px] rounded-full group-hover:bg-primary/30 transition-all duration-700"></div>
 
                         <div className="relative z-10 text-center">
                             <h3 className="text-gray-400 font-bold uppercase text-sm tracking-wider mb-2">{t('lottery.number_label')}</h3>
-                            <div className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-6 font-mono bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400">
+                            <div className="text-6xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tighter mb-6 font-mono bg-clip-text text-transparent bg-gradient-to-b from-slate-900 to-slate-600 dark:from-white dark:to-gray-400">
                                 {fallaNumber}
                             </div>
 
-                            <div className="flex items-center justify-center gap-4 text-white/80 bg-white/5 py-4 rounded-2xl border border-white/5 mb-6">
+                            <div className="flex items-center justify-center gap-4 text-slate-700 dark:text-white/80 bg-gray-50 dark:bg-white/5 py-4 rounded-2xl border border-gray-100 dark:border-white/5 mb-6">
                                 <DollarSign className="text-primary" />
                                 <div className="text-left">
-                                    <p className="text-xs text-gray-400 uppercase font-bold">{t('lottery.price_label')}</p>
-                                    <p className="text-xl font-bold">{price}€ <span className="text-sm font-normal text-gray-500">({donation}€ donativo)</span></p>
+                                    <p className="text-xs text-slate-500 dark:text-gray-400 uppercase font-bold">{t('lottery.price_label')}</p>
+                                    <p className="text-xl font-bold text-slate-900 dark:text-white">{price}€ <span className="text-sm font-normal text-slate-500">({donation}€ donativo)</span></p>
                                 </div>
                             </div>
 
                             {(drawDate || deadlineDate) && (
-                                <div className="grid grid-cols-1 gap-4 text-left border-t border-white/10 pt-6">
+                                <div className="grid grid-cols-1 gap-4 text-left border-t border-gray-100 dark:border-white/10 pt-6">
                                     {drawDate && (
-                                        <div className="flex items-center gap-3 text-sm text-gray-300">
+                                        <div className="flex items-center gap-3 text-sm text-slate-700 dark:text-gray-300">
                                             <Calendar className="text-primary w-5 h-5" />
                                             <div>
-                                                <p className="text-xs text-gray-500 uppercase font-bold">Fecha del Sorteo</p>
-                                                <p className="font-bold">{new Date(drawDate).toLocaleDateString()} - {new Date(drawDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                                <p className="text-xs text-slate-500 dark:text-gray-500 uppercase font-bold">Fecha del Sorteo</p>
+                                                <p className="font-bold text-slate-900 dark:text-white">{new Date(drawDate).toLocaleDateString()} - {new Date(drawDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                             </div>
                                         </div>
                                     )}

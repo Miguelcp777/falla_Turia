@@ -4,8 +4,10 @@ import { Flame, Calendar, Newspaper, Plus, Upload, Clover, Save, Users, Shield, 
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSiteConfig } from '@/context/SiteConfigContext'
+import ActivityAnalytics from '@/components/admin/ActivityAnalytics'
+import DirectivaManager from '@/components/admin/DirectivaManager'
 
-type Tab = 'news' | 'agenda' | 'lottery' | 'users' | 'representatives' | 'gallery' | 'clothing' | 'settings' | 'roles' | 'actas'
+type Tab = 'news' | 'agenda' | 'lottery' | 'users' | 'representatives' | 'gallery' | 'clothing' | 'settings' | 'roles' | 'actas' | 'logs' | 'directiva'
 
 export default function Dashboard() {
     const { role, hasPermission } = useAuth()
@@ -88,6 +90,7 @@ export default function Dashboard() {
     })
     const [clothingImageFile, setClothingImageFile] = useState<File | null>(null)
 
+
     const fetchActas = async () => {
         try {
             const { data, error } = await supabase.from('documents').select('*').order('created_at', { ascending: false })
@@ -118,6 +121,8 @@ export default function Dashboard() {
             fetchOrders()
         } else if (activeTab === 'actas' && hasPermission('can_manage_actas')) {
             fetchActas()
+        } else if (activeTab === 'logs' && role === 'admin') {
+            // Analytics component handles its own data fetching
         } else if (activeTab === 'settings') {
             // Initialize settings form with current values from context
             setSettingsYear(currentYear)
@@ -862,9 +867,10 @@ export default function Dashboard() {
                         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-orange-500 mb-2">
                             {t('dashboard.title')}
                         </h1>
-                        <p className="text-gray-400">
+                        <p className="text-slate-500 dark:text-gray-400 transition-colors duration-500">
                             {t('dashboard.subtitle')}
-                        </p>    </div>
+                        </p>
+                    </div>
                 </div>
 
                 <div className="flex flex-wrap gap-4 mb-8">
@@ -873,7 +879,7 @@ export default function Dashboard() {
                             onClick={() => setActiveTab('news')}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'news'
                                 ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
                                 }`}
                         >
                             <Newspaper size={20} />
@@ -885,7 +891,7 @@ export default function Dashboard() {
                             onClick={() => setActiveTab('agenda')}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'agenda'
                                 ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
                                 }`}
                         >
                             <Calendar size={20} />
@@ -897,7 +903,7 @@ export default function Dashboard() {
                             onClick={() => setActiveTab('lottery')}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'lottery'
                                 ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
                                 }`}
                         >
                             <Clover size={20} />
@@ -909,7 +915,7 @@ export default function Dashboard() {
                             onClick={() => setActiveTab('gallery')}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'gallery'
                                 ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
                                 }`}
                         >
                             <ImageIcon size={20} />
@@ -921,7 +927,7 @@ export default function Dashboard() {
                             onClick={() => setActiveTab('actas')}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'actas'
                                 ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
                                 }`}
                         >
                             <FileText size={20} />
@@ -934,7 +940,7 @@ export default function Dashboard() {
                                 onClick={() => setActiveTab('users')}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'users'
                                     ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                                    : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                    : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
                                     }`}
                             >
                                 <Users size={20} />
@@ -944,7 +950,7 @@ export default function Dashboard() {
                                 onClick={() => setActiveTab('roles')}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'roles'
                                     ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                                    : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                    : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
                                     }`}
                             >
                                 <Shield size={20} />
@@ -954,7 +960,7 @@ export default function Dashboard() {
                                 onClick={() => setActiveTab('representatives')}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'representatives'
                                     ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                                    : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                    : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
                                     }`}
                             >
                                 <Crown size={20} />
@@ -967,32 +973,56 @@ export default function Dashboard() {
                             onClick={() => setActiveTab('clothing')}
                             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'clothing'
                                 ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
                                 }`}
                         >
                             <ShoppingBag size={20} />
                             {t('dashboard.tabs.clothing')}
                         </button>
                     )}
-                    {role === 'admin' && (
+                    {(role === 'admin' || role === 'directivo/a') && (
                         <button
-                            onClick={() => setActiveTab('settings')}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'settings'
+                            onClick={() => setActiveTab('directiva')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'directiva'
                                 ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
-                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
                                 }`}
                         >
-                            <Settings size={20} />
-                            {t('dashboard.tabs.settings')}
+                            <Users size={20} />
+                            Directiva
                         </button>
+                    )}
+                    {role === 'admin' && (
+                        <>
+                            <button
+                                onClick={() => setActiveTab('logs')}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'logs'
+                                    ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
+                                    : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
+                                    }`}
+                            >
+                                <RefreshCw size={20} className={loading && activeTab === 'logs' ? 'animate-spin' : ''} />
+                                Actividad
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('settings')}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'settings'
+                                    ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
+                                    : 'bg-black/5 dark:bg-surface-dark/50 backdrop-blur-sm border border-black/5 dark:border-white/5 text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 hover:border-primary/30'
+                                    }`}
+                            >
+                                <Settings size={20} />
+                                {t('dashboard.tabs.settings')}
+                            </button>
+                        </>
                     )}
                 </div>
 
-                <div className="bg-surface-dark border border-white/5 rounded-3xl p-8 shadow-xl">
+                <div className="bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/5 rounded-3xl p-8 shadow-sm dark:shadow-xl transition-colors duration-500">
                     {activeTab === 'news' && (
                         <>
                             <form onSubmit={handleCreateNews} className="space-y-6 max-w-2xl">
-                                <h2 className="text-2xl font-bold text-white mb-6">
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 transition-colors duration-500">
                                     {editingNewsId ? t('dashboard.news.title_edit') : t('dashboard.news.title_new')}
                                 </h2>
 
@@ -2102,6 +2132,12 @@ export default function Dashboard() {
                                 </div>
                             )}
                         </div>
+                    )}
+                    {activeTab === 'logs' && role === 'admin' && (
+                        <ActivityAnalytics />
+                    )}
+                    {(activeTab === 'directiva' && (role === 'admin' || role === 'directivo/a')) && (
+                        <DirectivaManager />
                     )}
                     {activeTab === 'settings' && role === 'admin' && (
                         <div>
