@@ -56,7 +56,32 @@ export const handler: Handler = async (event) => {
         const supabase = createClient(supabaseUrl, supabaseKey);
         const openai = new OpenAI({ apiKey: openaiApiKey });
 
-        // 1. Generate embedding for the query to search relevant actas
+        // 1. Fetch Agenda (Upcoming events)
+        const { data: events } = await supabase
+            .from('agenda')
+            .select('title, description, event_date, location')
+            .gte('event_date', new Date().toISOString())
+            .order('event_date', { ascending: true })
+            .limit(5);
+
+        const agendaContext = events && events.length > 0 
+            ? '\n\n--- PRÓXIMOS EVENTOS (AGENDA) ---\n' + 
+              events.map(e => `- ${e.title} (${new Date(e.event_date).toLocaleDateString()} a les ${new Date(e.event_date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}h): ${e.description} en ${e.location}`).join('\n')
+            : '';
+
+        // 2. Fetch Latest News
+        const { data: news } = await supabase
+            .from('news')
+            .select('title, content, published_at')
+            .order('published_at', { ascending: false })
+            .limit(3);
+
+        const newsContext = news && news.length > 0
+            ? '\n\n--- ÚLTIMAS NOTICIAS ---\n' +
+              news.map(n => `- ${n.title} (${new Date(n.published_at).toLocaleDateString()}): ${n.content.substring(0, 200)}...`).join('\n')
+            : '';
+
+        // 3. Generate embedding for the query to search relevant actas
         const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-3-small',
             input: message,
@@ -64,11 +89,11 @@ export const handler: Handler = async (event) => {
 
         const queryEmbedding = embeddingResponse.data[0].embedding;
 
-        // 2. Search for relevant document chunks in the vector DB
+        // 4. Search for relevant document chunks in the vector DB
         console.log(`Searching for context for message: "${message}"`);
         const { data: matchedChunks, error: rpcError } = await supabase.rpc('match_documents', {
             query_embedding: queryEmbedding,
-            match_threshold: 0.3, // Lowered for more flexibility
+            match_threshold: 0.3, 
             match_count: 5
         });
 
@@ -78,15 +103,15 @@ export const handler: Handler = async (event) => {
 
         console.log(`Found ${matchedChunks?.length || 0} matching chunks`);
 
-        let contextText = '';
+        let actasContext = '';
         if (matchedChunks && matchedChunks.length > 0) {
-            contextText = '\n\n--- CONTEXT DE LES ACTES DE LA FALLA ---\n' +
+            actasContext = '\n\n--- CONTEXT DE LES ACTES DE LA FALLA (REUNIONS) ---\n' +
                 matchedChunks.map((c: any) => c.content).join('\n\n---\n\n') +
-                '\n--- FI DEL CONTEXT ---';
+                '\n--- FI DEL CONTEXT DE LES ACTES ---';
         }
 
-        // 3. Build messages for ChatCompletion with conversation history
-        const systemPrompt = TURIANIN_SYSTEM_PROMPT + contextText;
+        // 5. Build messages for ChatCompletion with conversation history
+        const systemPrompt = TURIANIN_SYSTEM_PROMPT + agendaContext + newsContext + actasContext;
 
         const messages = [
             { role: 'system' as const, content: systemPrompt },
@@ -97,7 +122,7 @@ export const handler: Handler = async (event) => {
             { role: 'user' as const, content: message }
         ];
 
-        // 4. Get response from OpenAI
+        // 6. Get response from OpenAI
         const completion = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages,
