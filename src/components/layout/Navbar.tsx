@@ -27,7 +27,7 @@ export default function Navbar() {
     const isActive = (path: string) => location.pathname === path
     const navLinkClass = (path: string) => `px-3 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${isActive(path)
         ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] scale-105'
-        : 'text-gray-300 hover:text-white hover:bg-white/10 hover:shadow-[0_0_10px_rgba(239,68,68,0.2)]'
+        : 'text-slate-600 dark:text-gray-300 hover:text-primary dark:hover:text-white hover:bg-primary/5 dark:hover:bg-white/10'
         }`
 
     const handleSignOut = async () => {
@@ -57,7 +57,7 @@ export default function Navbar() {
     )
 
     return (
-        <nav className="sticky top-0 z-50 w-full bg-background-dark/95 backdrop-blur-md border-b border-surface-dark">
+        <nav className="sticky top-0 z-50 w-full bg-white/90 dark:bg-background-dark/95 backdrop-blur-md border-b border-gray-100 dark:border-surface-dark transition-colors duration-500">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
                     <div className="flex items-center gap-3">
@@ -66,12 +66,12 @@ export default function Navbar() {
                                 <img src="/escudo.jpg" alt="Falla Turia" className="w-full h-full object-cover" />
                             </div>
                             <div className="flex flex-col hidden sm:flex justify-center items-start h-12">
-                                <span className="font-display font-black text-xl leading-none tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-primary to-primary-dark drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] filter transition-all whitespace-nowrap uppercase">
-                                    Falla Turia
-                                </span>
-                                <span className="font-display font-bold text-xs leading-none tracking-[0.15em] text-gray-300 group-hover:text-white transition-colors whitespace-nowrap uppercase mt-1">
-                                    Plaça de l' Ajuntament
-                                </span>
+                                <span className="font-display font-black text-xl leading-none tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-primary-dark via-primary to-orange-500 dark:from-orange-400 dark:via-primary dark:to-primary-dark drop-shadow-[0_1px_1px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] filter transition-all whitespace-nowrap uppercase">
+                                     Falla Turia
+                                 </span>
+                                 <span className="font-display font-bold text-xs leading-none tracking-[0.15em] text-slate-500 dark:text-gray-300 group-hover:text-primary dark:group-hover:text-white transition-colors whitespace-nowrap uppercase mt-1">
+                                     Plaça de l' Ajuntament
+                                 </span>
                             </div>
                         </Link>
                     </div>
@@ -146,14 +146,14 @@ export default function Navbar() {
 
                             <button
                                 onClick={() => setLanguage('es')}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${language === 'es' ? 'bg-primary text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${language === 'es' ? 'bg-primary text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:bg-white/10 dark:text-gray-300'}`}
                             >
                                 <FlagES />
                                 <span>ES</span>
                             </button>
                             <button
-                                onClick={() => setLanguage('ca')}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${language === 'ca' ? 'bg-primary text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                                onClick={() => setLanguage('va')}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${language === 'va' ? 'bg-primary text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:bg-white/10 dark:text-gray-300'}`}
                             >
                                 <FlagVA />
                                 <span>VAL</span>

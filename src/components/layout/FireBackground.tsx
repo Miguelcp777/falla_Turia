@@ -143,7 +143,7 @@ const FireBackground = () => {
     return (
         <canvas
             ref={canvasRef}
-            className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10"
+            className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 hidden dark:block"
             style={{
                 // Blur the entire canvas slightly to blend particles into a fluid
                 filter: 'blur(2px)',
