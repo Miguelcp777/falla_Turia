@@ -1,11 +1,11 @@
 import { useState, useEffect, Fragment, FormEvent } from 'react'
 import { supabase, Profile, UserRole } from '@/lib/supabase'
-import { Flame, Calendar, Newspaper, Plus, Upload, Clover, Save, Users, Shield, CheckCircle, XCircle, Trash2, Edit2 as Edit, X, Crown, Image as ImageIcon, ShoppingBag, AlertCircle, MapPin, Loader2, RefreshCw, Settings } from 'lucide-react'
+import { Flame, Calendar, Newspaper, Plus, Upload, Clover, Save, Users, Shield, CheckCircle, XCircle, Trash2, Edit2 as Edit, X, Crown, Image as ImageIcon, ShoppingBag, AlertCircle, MapPin, Loader2, RefreshCw, Settings, FileText } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSiteConfig } from '@/context/SiteConfigContext'
 
-type Tab = 'news' | 'agenda' | 'lottery' | 'users' | 'representatives' | 'gallery' | 'clothing' | 'settings' | 'roles'
+type Tab = 'news' | 'agenda' | 'lottery' | 'users' | 'representatives' | 'gallery' | 'clothing' | 'settings' | 'roles' | 'actas'
 
 export default function Dashboard() {
     const { role, hasPermission } = useAuth()
@@ -64,6 +64,12 @@ export default function Dashboard() {
     const [editingUserId, setEditingUserId] = useState<string | null>(null)
     const [editingUserData, setEditingUserData] = useState<Partial<Profile>>({})
 
+    // Actas
+    const [actasList, setActasList] = useState<any[]>([])
+    const [uploadingActa, setUploadingActa] = useState(false)
+    const [actaTitle, setActaTitle] = useState('')
+    const [actaFile, setActaFile] = useState<File | null>(null)
+
     // Clothing & Orders
     const [clothingItems, setClothingItems] = useState<any[]>([])
     const [clothingOrders, setClothingOrders] = useState<any[]>([])
@@ -81,6 +87,16 @@ export default function Dashboard() {
         active: true
     })
     const [clothingImageFile, setClothingImageFile] = useState<File | null>(null)
+
+    const fetchActas = async () => {
+        try {
+            const { data, error } = await supabase.from('documents').select('*').order('created_at', { ascending: false })
+            if (error) throw error
+            if (data) setActasList(data)
+        } catch (error) {
+            console.error('Error fetching actas:', error)
+        }
+    }
 
     useEffect(() => {
         if (activeTab === 'lottery') {
@@ -100,6 +116,8 @@ export default function Dashboard() {
         } else if (activeTab === 'clothing') {
             fetchClothingItems()
             fetchOrders()
+        } else if (activeTab === 'actas' && hasPermission('can_manage_actas')) {
+            fetchActas()
         } else if (activeTab === 'settings') {
             // Initialize settings form with current values from context
             setSettingsYear(currentYear)
@@ -152,6 +170,71 @@ export default function Dashboard() {
             setRolePermissionsData(prev => prev.map(r => r.role === roleName ? { ...r, [field]: value } : r))
         } catch (e: any) {
             alert('Error updating permission: ' + e.message)
+        }
+    }
+
+    const handleUploadActa = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!actaTitle || !actaFile) return
+
+        try {
+            setUploadingActa(true)
+
+            // 1. Upload to Supabase Storage
+            const fileExt = actaFile.name.split('.').pop()
+            const fileName = `${Math.random()}.${fileExt}`
+            const filePath = `${fileName}`
+
+            const { error: uploadError } = await supabase.storage
+                .from('actas')
+                .upload(filePath, actaFile)
+
+            if (uploadError) throw uploadError
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('actas')
+                .getPublicUrl(filePath)
+
+            // 2. Call Netlify Function to process document
+            const { data: { user } } = await supabase.auth.getUser()
+            
+            const response = await fetch('/.netlify/functions/process-document', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    fileUrl: publicUrl,
+                    title: actaTitle,
+                    createdBy: user?.id
+                })
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(errorData.error || 'Failed to process document')
+            }
+
+            setActaTitle('')
+            setActaFile(null)
+            fetchActas()
+            alert('Acta procesada y guardada correctamente.')
+        } catch (error: any) {
+            console.error('Error uploading acta:', error)
+            alert('Error subiendo acta: ' + error.message)
+        } finally {
+            setUploadingActa(false)
+        }
+    }
+
+    const handleDeleteActa = async (id: string) => {
+        if (!confirm('¿Estás seguro de eliminar esta acta?')) return
+        try {
+            const { error } = await supabase.from('documents').delete().eq('id', id)
+            if (error) throw error
+            fetchActas()
+        } catch (error) {
+            console.error('Error deleting acta:', error)
         }
     }
 
@@ -833,6 +916,18 @@ export default function Dashboard() {
                             {t('dashboard.tabs.gallery')}
                         </button>
                     )}
+                    {hasPermission('can_manage_actas') && (
+                        <button
+                            onClick={() => setActiveTab('actas')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 active:scale-95 ${activeTab === 'actas'
+                                ? 'bg-gradient-to-r from-primary to-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105'
+                                : 'bg-surface-dark/50 backdrop-blur-sm border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)]'
+                                }`}
+                        >
+                            <FileText size={20} />
+                            Actas
+                        </button>
+                    )}
                     {hasPermission('can_manage_roles') && (
                         <>
                             <button
@@ -1402,6 +1497,78 @@ export default function Dashboard() {
                                         ))}
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'actas' && hasPermission('can_manage_actas') && (
+                        <div className="space-y-10">
+                            {/* Upload Form */}
+                            <form onSubmit={handleUploadActa} className="space-y-6 max-w-2xl bg-white/5 p-6 rounded-2xl border border-white/5">
+                                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                    <FileText size={24} className="text-primary" />
+                                    Subir Nueva Acta
+                                </h3>
+                                
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-gray-400 text-sm font-bold mb-2">Título del Acta</label>
+                                        <input
+                                            type="text"
+                                            value={actaTitle}
+                                            onChange={(e) => setActaTitle(e.target.value)}
+                                            className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors"
+                                            placeholder="Ej: Acta Junta Directiva Mayo 2025"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-400 text-sm font-bold mb-2">Archivo PDF</label>
+                                        <input
+                                            type="file"
+                                            accept="application/pdf"
+                                            onChange={(e) => setActaFile(e.target.files?.[0] || null)}
+                                            className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={uploadingActa || !actaTitle || !actaFile}
+                                    className="flex items-center justify-center w-full gap-2 bg-primary hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {uploadingActa ? <Loader2 size={20} className="animate-spin" /> : <Upload size={20} />}
+                                    {uploadingActa ? 'Procesando PDF e Inteligencia Artificial...' : 'Subir y Procesar Acta'}
+                                </button>
+                            </form>
+
+                            {/* Actas List */}
+                            <div className="space-y-4">
+                                <h3 className="text-xl font-bold text-white mb-4">Actas Procesadas</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {actasList.map(acta => (
+                                        <div key={acta.id} className="bg-white/5 border border-white/10 rounded-xl p-4 flex justify-between items-start">
+                                            <div>
+                                                <h4 className="text-lg font-bold text-white mb-1">{acta.title}</h4>
+                                                <p className="text-sm text-gray-400 mb-2">
+                                                    {new Date(acta.created_at).toLocaleDateString()}
+                                                </p>
+                                                <a href={acta.file_path} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-red-400 text-sm font-medium flex items-center gap-1">
+                                                    <FileText size={14} /> Ver PDF
+                                                </a>
+                                            </div>
+                                            <button
+                                                onClick={() => handleDeleteActa(acta.id)}
+                                                className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                title="Eliminar Acta"
+                                            >
+                                                <Trash2 size={20} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     )}
