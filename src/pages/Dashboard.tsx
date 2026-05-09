@@ -1254,6 +1254,7 @@ export default function Dashboard() {
                                                                 <option value="editor">{t('dashboard.users.role_editor')}</option>
                                                                 <option value="author">{t('dashboard.users.role_author')}</option>
                                                                 <option value="subscriber">{t('dashboard.users.role_subscriber')}</option>
+                                                                <option value="directivo/a">Directivo/a</option>
                                                             </select>
                                                         </div>
                                                     </td>

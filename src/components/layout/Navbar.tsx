@@ -76,29 +76,31 @@ export default function Navbar() {
                             <Link to="/news" className={navLinkClass('/news')}>
                                 {t('nav.news')}
                             </Link>
-                            <Link to="/agenda" className={navLinkClass('/agenda')}>
-                                {t('nav.agenda')}
-                            </Link>
-                            <Link to="/lottery" className={navLinkClass('/lottery')}>
-                                {t('nav.lottery')}
-                            </Link>
                             <Link to="/representatives" className={navLinkClass('/representatives')}>
                                 {t('nav.representatives')}
                             </Link>
-                            <Link to="/gallery" className={navLinkClass('/gallery')}>
-                                {t('nav.gallery')}
-                            </Link>
-                            <Link to="/clothing" className={navLinkClass('/clothing')}>
-                                {t('nav.clothing')}
-                            </Link>
 
-                            {checkPermission(['subscriber', 'author', 'editor', 'admin']) && (
-                                <Link to="/suggestions" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                                    {t('nav.suggestions')}
-                                </Link>
+                            {checkPermission(['subscriber', 'author', 'editor', 'admin', 'directivo/a']) && (
+                                <>
+                                    <Link to="/agenda" className={navLinkClass('/agenda')}>
+                                        {t('nav.agenda')}
+                                    </Link>
+                                    <Link to="/lottery" className={navLinkClass('/lottery')}>
+                                        {t('nav.lottery')}
+                                    </Link>
+                                    <Link to="/gallery" className={navLinkClass('/gallery')}>
+                                        {t('nav.gallery')}
+                                    </Link>
+                                    <Link to="/clothing" className={navLinkClass('/clothing')}>
+                                        {t('nav.clothing')}
+                                    </Link>
+                                    <Link to="/suggestions" className="text-gray-300 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                        {t('nav.suggestions')}
+                                    </Link>
+                                </>
                             )}
 
-                            {checkPermission(['admin', 'editor', 'author']) && (
+                            {checkPermission(['admin', 'editor', 'author', 'directivo/a']) && (
                                 <Link to="/admin" className="bg-primary/10 text-primary hover:bg-primary/20 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] flex items-center gap-2">
                                     <Shield size={16} />
                                     {t('nav.panel')}
@@ -205,15 +207,19 @@ export default function Navbar() {
                         <Link to="/" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.home')}</Link>
                         <Link to="/institution" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.institution')}</Link>
                         <Link to="/news" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.news')}</Link>
-                        <Link to="/agenda" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.agenda')}</Link>
-                        <Link to="/lottery" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.lottery')}</Link>
                         <Link to="/representatives" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.representatives')}</Link>
-                        <Link to="/gallery" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.gallery')}</Link>
-                        <Link to="/clothing" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.clothing')}</Link>
-                        {checkPermission(['subscriber', 'author', 'editor', 'admin']) && (
-                            <Link to="/suggestions" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.suggestions_full')}</Link>
+                        
+                        {checkPermission(['subscriber', 'author', 'editor', 'admin', 'directivo/a']) && (
+                            <>
+                                <Link to="/agenda" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.agenda')}</Link>
+                                <Link to="/lottery" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.lottery')}</Link>
+                                <Link to="/gallery" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.gallery')}</Link>
+                                <Link to="/clothing" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.clothing')}</Link>
+                                <Link to="/suggestions" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{t('nav.suggestions_full')}</Link>
+                            </>
                         )}
-                        {checkPermission(['admin', 'editor', 'author']) && (
+                        
+                        {checkPermission(['admin', 'editor', 'author', 'directivo/a']) && (
                             <Link to="/admin" onClick={() => setIsOpen(false)} className="text-primary hover:text-red-400 block px-3 py-2 rounded-md text-base font-medium font-bold">{t('nav.panel')}</Link>
                         )}
 

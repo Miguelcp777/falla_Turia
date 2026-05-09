@@ -49,19 +49,19 @@ function App() {
                                 <Route path="/institution" element={<Institution />} />
                                 <Route path="/reset-password" element={<ResetPassword />} />
                                 <Route path="/news" element={<News />} />
-                                <Route path="/agenda" element={<Agenda />} />
-                                <Route path="/lottery" element={<Lottery />} />
                                 <Route path="/representatives" element={<Representatives />} />
-                                <Route path="/gallery" element={<Gallery />} />
-                                <Route path="/clothing" element={<Clothing />} />
 
                                 {/* Member Routes - Accessible by all authenticated users */}
-                                <Route element={<ProtectedRoute allowedRoles={['subscriber', 'author', 'editor', 'admin']} />}>
+                                <Route element={<ProtectedRoute allowedRoles={['subscriber', 'author', 'editor', 'admin', 'directivo/a']} />}>
+                                    <Route path="/agenda" element={<Agenda />} />
+                                    <Route path="/lottery" element={<Lottery />} />
+                                    <Route path="/gallery" element={<Gallery />} />
+                                    <Route path="/clothing" element={<Clothing />} />
                                     <Route path="/suggestions" element={<Suggestions />} />
                                 </Route>
 
                                 {/* Admin/Content Routes */}
-                                <Route element={<ProtectedRoute allowedRoles={['admin', 'editor', 'author']} />}>
+                                <Route element={<ProtectedRoute allowedRoles={['admin', 'editor', 'author', 'directivo/a']} />}>
                                     <Route path="/admin" element={<Dashboard />} />
                                 </Route>
                             </Routes>
